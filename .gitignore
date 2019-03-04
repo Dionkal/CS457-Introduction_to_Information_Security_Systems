@@ -1,7 +1,11 @@
 *.o
 
+
 SymmetricKeyExchange/Client/client
+client
 
 SymmetricKeyExchange/Server/server
+server
 
 SymmetricKeyExchange/demo
+demo
