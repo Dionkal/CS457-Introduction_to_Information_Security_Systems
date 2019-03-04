@@ -16,4 +16,4 @@ demo: crypto_demo.c cs457_crypto.o
 	$(CC) $(CFLAGS) $(LIBSSL) $^ -o $@
 
 clean:
-	rm -f $(TARGETS) *.o
+	rm -f demo Server/server Client/client  *.o

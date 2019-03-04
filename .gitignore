@@ -1,0 +1,7 @@
+*.o
+
+Client/client
+
+Server/server
+
+demo
