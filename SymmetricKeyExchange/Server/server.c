@@ -17,7 +17,7 @@
  * and select an other port by changing
  * this value or by using -p <port>
  */
-#define DEFAULT_PORT 5000
+#define DEFAULT_PORT 3613
 
 /*
  * prints the usage message
@@ -37,6 +37,15 @@ void usage(void)
 	exit(EXIT_FAILURE);
 }
 
+void closeSockets(int fd1, int fd2)
+{
+	shutdown(fd1, SHUT_RDWR);
+	shutdown(fd2, SHUT_RDWR);
+	sleep(10);
+	close(fd1);
+	close(fd2);
+}
+
 /*
  * simple chat server with RSA-based AES
  * key-exchange for encrypted communication
@@ -54,6 +63,7 @@ int main(int argc, char *argv[])
 	size_t rxb;						  /* received bytes	  */
 	size_t txb;						  /* transmitted bytes	  */
 	struct sockaddr_in srv_addr;	  /* server socket address  */
+	int addrlen = sizeof(srv_addr);   /* size of srv_addr	*/
 	unsigned char *aes_key;			  /* AES key		  */
 	unsigned char plaintext[BUFLEN];  /* plaintext buffer	  */
 	unsigned char ciphertext[BUFLEN]; /* plaintext buffer	  */
@@ -82,7 +92,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* socket init */
-	if (sockfd = socket(AF_INET, SOCK_STREAM, 0) < 0)
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		perror("socket failed");
 		exit(EXIT_FAILURE);
@@ -109,24 +119,24 @@ int main(int argc, char *argv[])
 	srv_addr.sin_addr.s_addr = INADDR_ANY;
 	srv_addr.sin_port = htons(port);
 
-	if (bind(sockfd, (struct sockaddr *)&srv_addr, sizeof(srv_addr)) < 0)
+	if (bind(sockfd, (struct sockaddr *)&srv_addr, sizeof(srv_addr)) != 0)
 	{
-		printf("ERROR %d:\tError binding socket\n", errno);
+		perror("bind failed");
 		exit(EXIT_FAILURE);
 	}
 
-	if (listen(sockfd, 0) < 0)
+	if (listen(sockfd, 1) < 0)
 	{
-		printf("ERROR %d:\tError listening to socket\n", errno);
+		perror("listen");
 		exit(EXIT_FAILURE);
 	}
 
 	/* load keys */
 
 	/* accept a new client connection */
-	if ((sockcl = accept(sockfd, (struct sockaddr *)&srv_addr, (socklen_t *)(sizeof(srv_addr)))) < 0)
+	if ((sockcl = accept(sockfd, (struct sockaddr *)&srv_addr, (socklen_t *)&addrlen)) < 0)
 	{
-		printf("ERROR %d:\tError accepting socket\n", errno);
+		perror("accept");
 		exit(EXIT_FAILURE);
 	}
 
@@ -136,11 +146,12 @@ int main(int argc, char *argv[])
 
 	/* receive the encrypted message */
 	read(sockcl, plaintext, BUFLEN);
-
+	printf("Recieved: \"%s\"\n", plaintext);
 	/* Decrypt the message and print it */
-	printf("Recieved: %s\n", plaintext);
 	send(sockcl, plaintext, strlen(plaintext), 0);
+	printf("Sent: \"%s\"\n", plaintext);
 	/* cleanup */
+	closeSockets(sockfd, sockcl);
 
 	return 0;
 }

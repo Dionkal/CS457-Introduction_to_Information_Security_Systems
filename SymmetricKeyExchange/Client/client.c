@@ -57,6 +57,13 @@ void check_args(char *ip, unsigned char *msg, int port)
 		usage();
 }
 
+void closeSocket(int fd)
+{
+	shutdown(fd, SHUT_RDWR);
+	sleep(10);
+	close(fd);
+}
+
 /*
  * simple chat client with RSA-based AES
  * key-exchange for encrypted communication
@@ -145,18 +152,20 @@ int main(int argc, char *argv[])
    * and send it to the server
    */
 	send(cfd, msg, strlen(msg), 0);
+	printf("Sent: \"%s\"\n", msg);
 	/*
    * receive the key from the server,
    * decrypt it and register it
    */
 	read(cfd, plaintext, BUFLEN);
+	printf("Recieved: \"%s\"\n", plaintext);
 
 	/* encrypt the message with the AES key */
 
 	/* send the encrypted message */
 
 	/* cleanup */
-
+	closeSocket(cfd);
 	return 0;
 }
 
