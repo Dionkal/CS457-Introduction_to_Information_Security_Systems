@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	unsigned char ciphertext[BUFLEN];
 	unsigned char decryptedtext[BUFLEN];
 
-	strncpy((char *)&plaintext, (char *)((unsigned char *)"csd3613_csd361"), BUFLEN);
+	strncpy((char *)&plaintext, (char *)((unsigned char *)"This is a large string that needs more blocks"), BUFLEN);
 
 	/*----------------------------------------------Encrypt----------------------------------------------*/
 	cipher_text_len = aes_encrypt(plaintext, strlen((const char *)&plaintext), key, NULL, ciphertext, AES_128_ECB);
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
 	/*----------------------------------------------Decrypt----------------------------------------------*/
 	decrypted_text_len = aes_decrypt(ciphertext, cipher_text_len, key, NULL, decryptedtext, AES_128_ECB);
-	/*decryptedtext[decrypted_text_len] = '\0';*/
+	decryptedtext[decrypted_text_len] = '\0';
 	printf("Decrypted text (%d):\n", decrypted_text_len);
 	printf("%s\n", decryptedtext);
 
