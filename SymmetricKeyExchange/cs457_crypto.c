@@ -109,7 +109,7 @@ aes_read_key(void)
 {
 }
 
-/* 
+/*
  * retrieves an RSA key from the key file
  */
 RSA *rsa_read_key(char *kfile)
@@ -118,11 +118,14 @@ RSA *rsa_read_key(char *kfile)
 
 /* ----------------------------- AES functions ------------------------------ */
 
+/*Function dispather for different modes of aes*/
+const EVP_CIPHER *(*EncryptionFunctionDispatcher[])() = {EVP_aes_128_ecb, EVP_aes_128_cbc};
+
 /*
  * encrypts the data with 128-bit AES ECB
  */
 int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-				unsigned char *iv, unsigned char *ciphertext)
+				unsigned char *iv, unsigned char *ciphertext, unsigned int mode)
 {
 	EVP_CIPHER_CTX *ctx;
 
@@ -132,18 +135,18 @@ int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 	/* Create and initialise the context */
 	if (!(ctx = EVP_CIPHER_CTX_new()))
-		handleErrors();
+		return -1;
 
 	/* Initialise the encryption operation */
-	if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv))
-		handleErrors();
+	if (1 != EVP_EncryptInit_ex(ctx, (*EncryptionFunctionDispatcher[mode])(), NULL, key, iv))
+		return -1;
 
 	if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
-		handleErrors();
+		return -1;
 	ciphertext_len = len;
 
 	if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
-		handleErrors();
+		return -1;
 	ciphertext_len += len;
 
 	/* Clean up */
@@ -156,8 +159,40 @@ int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
  * decrypts the data and returns the plaintext size
  */
 int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-				unsigned char *iv, unsigned char *plaintext)
+				unsigned char *iv, unsigned char *plaintext, unsigned int mode)
 {
+	EVP_CIPHER_CTX *ctx;
+
+	int len;
+
+	int plaintext_len;
+
+	/* Create and initialise the context */
+	if (!(ctx = EVP_CIPHER_CTX_new()))
+		return -1;
+
+	/* Initialise the decryption operation */
+	if (1 != EVP_DecryptInit_ex(ctx, (*EncryptionFunctionDispatcher[mode])(), NULL, key, iv))
+		return -1;
+
+	/* Provide the message to be decrypted, and obtain the plaintext output.
+   * EVP_DecryptUpdate can be called multiple times if necessary
+   */
+	if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+		return -1;
+	plaintext_len = len;
+
+	/* Finalise the decryption. Further plaintext bytes may be written at
+   * this stage.
+   */
+	if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
+		return -1;
+	plaintext_len += len;
+
+	/* Clean up */
+	EVP_CIPHER_CTX_free(ctx);
+
+	return plaintext_len;
 }
 
 /* ----------------------------- RSA functions ------------------------------ */

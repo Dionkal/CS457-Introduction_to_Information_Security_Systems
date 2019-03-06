@@ -37,6 +37,10 @@
 /* AES block size */
 #define AES_BS 16
 
+/*Encryption types*/
+#define AES_128_ECB 0
+#define AES_128_CBC 1
+
 /* key exchange init info */
 #define INIT_MSG "hello"
 #define INIT_MSG_LEN 5
@@ -65,7 +69,7 @@ void print_hex(unsigned char *data, size_t len);
 unsigned char *
 aes_read_key(void);
 
-/* 
+/*
  * retrieves an RSA key from the key file
  */
 RSA *rsa_read_key(char *kfile);
@@ -76,13 +80,13 @@ RSA *rsa_read_key(char *kfile);
  * encrypts the data with 128-bit AES ECB
  */
 int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-                unsigned char *iv, unsigned char *ciphertext);
+                unsigned char *iv, unsigned char *ciphertext, unsigned int mode);
 
 /*
  * decrypts the data and returns the plaintext size
  */
 int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
-                unsigned char *iv, unsigned char *plaintext);
+                unsigned char *iv, unsigned char *plaintext, unsigned int mode);
 
 /* ----------------------------- RSA functions ------------------------------ */
 
