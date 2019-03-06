@@ -145,10 +145,19 @@ int main(int argc, char *argv[])
 	/* send the AES key */
 
 	/* receive the encrypted message */
-	read(sockcl, plaintext, BUFLEN);
+	if (read(sockcl, plaintext, BUFLEN) < 0)
+	{
+		perror("read");
+		exit(EXIT_FAILURE);
+	}
 	printf("Recieved: \"%s\"\n", plaintext);
+
 	/* Decrypt the message and print it */
-	send(sockcl, plaintext, strlen(plaintext), 0);
+	if (send(sockcl, plaintext, BUFLEN, 0) < 0)
+	{
+		perror("send");
+		exit(EXIT_FAILURE);
+	}
 	printf("Sent: \"%s\"\n", plaintext);
 	/* cleanup */
 	closeSockets(sockfd, sockcl);

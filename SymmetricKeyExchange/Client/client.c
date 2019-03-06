@@ -151,13 +151,22 @@ int main(int argc, char *argv[])
    * encrypt the init message
    * and send it to the server
    */
-	send(cfd, msg, strlen(msg), 0);
+	/*strncpy(plaintext, msg, strlen(msg) + 1);*/
+	if (send(cfd, msg, strlen(msg) + 1, 0) < 0)
+	{
+		perror("send");
+		exit(EXIT_FAILURE);
+	}
 	printf("Sent: \"%s\"\n", msg);
 	/*
    * receive the key from the server,
    * decrypt it and register it
    */
-	read(cfd, plaintext, BUFLEN);
+	if (read(cfd, plaintext, BUFLEN) < 0)
+	{
+		perror("read");
+		exit(EXIT_FAILURE);
+	}
 	printf("Recieved: \"%s\"\n", plaintext);
 
 	/* encrypt the message with the AES key */
