@@ -291,18 +291,52 @@ int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
  * RSA Public(Private) encryption
  */
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
-						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext)
+						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext, int padding_mode_1, int padding_mode_2)
 {
-	return 0;
+	unsigned char intermediatetext[BUFLEN] = {0};
+	int intermediate_len = 0;
+
+	intermediate_len = rsa_prv_encrypt(plaintext, plaintext_len, priv_k, intermediatetext, padding_mode_1);
+
+	/* TODO: Remove debug prints */
+	printf("Private encryption: %d\n", intermediate_len);
+	print_hex(intermediatetext, intermediate_len);
+
+	int result = rsa_pub_encrypt(intermediatetext, intermediate_len, pub_k, ciphertext, padding_mode_2);
+
+	/* TODO: Remove debug prints */
+	printf("Public encryption: %d\n", result);
+	print_hex(ciphertext, result);
+
+	memset(intermediatetext, 0, BUFLEN);
+
+	return result;
 }
 
 /*
  * RSA Public(Private) decryption
  */
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext)
+						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext, int padding_mode_1, int padding_mode_2)
 {
-	return 0;
+	unsigned char intermediatetext[BUFLEN] = {0};
+	int intermediate_len = 0;
+
+	intermediate_len = rsa_pub_decrypt(ciphertext, ciphertext_len, pub_k, intermediatetext, padding_mode_1);
+
+	/* TODO: Remove debug prints */
+	printf("Public decryption: %d\n", intermediate_len);
+	print_hex(intermediatetext, intermediate_len);
+
+	int result = rsa_prv_decrypt(intermediatetext, intermediate_len, priv_k, plaintext, padding_mode_2);
+
+	/* TODO: Remove debug prints */
+	printf("Private decryption: %d\n", result);
+	print_hex(plaintext, result);
+
+	memset(intermediatetext, 0, BUFLEN);
+
+	return result;
 }
 
 /* EOF */

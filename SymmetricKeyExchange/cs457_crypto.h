@@ -117,13 +117,13 @@ int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
  * RSA Public(Private) encryption
  */
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
-                         RSA *pub_k, RSA *priv_k, unsigned char *ciphertext);
+                         RSA *pub_k, RSA *priv_k, unsigned char *ciphertext, int padding_mode_1, int padding_mode_2);
 
 /*
  * RSA Public(Private) decryption
  */
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                         RSA *pub_k, RSA *priv_k, unsigned char *plaintext);
+                         RSA *pub_k, RSA *priv_k, unsigned char *plaintext, int padding_mode_1, int padding_mode_2);
 
 #endif /* _CS457_CRYPTO_H_ */
 
