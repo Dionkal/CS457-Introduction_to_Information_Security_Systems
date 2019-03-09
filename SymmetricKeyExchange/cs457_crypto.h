@@ -66,8 +66,7 @@ void print_hex(unsigned char *data, size_t len);
 /*
  * retrieves an AES key from the key file
  */
-unsigned char *
-aes_read_key(void);
+unsigned char *aes_read_key(void);
 
 /*
  * retrieves an RSA key from the key file

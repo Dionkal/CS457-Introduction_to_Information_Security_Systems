@@ -12,10 +12,13 @@ int main(int argc, char **argv)
 {
 	int cipher_text_len, decrypted_text_len;
 	unsigned int numberOfBlocks;
-	unsigned char *key = (unsigned char *)"3DFFD7544A955E0580D2A67C7DC6E550";
+	unsigned char *key = NULL;
 	unsigned char plaintext[BUFLEN] = {0};
 	unsigned char ciphertext[BUFLEN] = {0};
 	unsigned char decryptedtext[BUFLEN] = {0};
+
+	/* Read key from file*/
+	key = aes_read_key();
 
 	/* Variable initialization */
 	cipher_text_len = decrypted_text_len = numberOfBlocks = 0;

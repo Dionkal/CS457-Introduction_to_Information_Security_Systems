@@ -104,9 +104,25 @@ void print_hex(unsigned char *data, size_t len)
 /*
  * retrieves an AES key from the key file
  */
-unsigned char *
-aes_read_key(void)
+unsigned char *aes_read_key(void)
 {
+	unsigned char **key = NULL;
+	FILE *aes_key_file = fopen(AES_KF, "r");
+	if (aes_key_file == NULL)
+	{
+		perror("fopen");
+		exit(EXIT_FAILURE);
+	}
+	size_t key_size = 0;
+	if (getline((char **)&key, &key_size, aes_key_file) < 0)
+	{
+		perror("getline");
+		free(key);
+		exit(EXIT_FAILURE);
+	}
+
+	fclose(aes_key_file);
+	return key;
 }
 
 /*
