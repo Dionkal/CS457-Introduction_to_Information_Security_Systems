@@ -10,24 +10,28 @@
  */
 int main(int argc, char **argv)
 {
-	int cipher_text_len, decrypted_text_len;
-	unsigned int numberOfBlocks;
-	unsigned char *key = NULL;
+	int cipher_text_len, decrypted_text_len, plain_text_len;
 	unsigned char plaintext[BUFLEN] = {0};
 	unsigned char ciphertext[BUFLEN] = {0};
 	unsigned char decryptedtext[BUFLEN] = {0};
-
-	/* Read key from file*/
-	key = aes_read_key();
+	RSA *private_key;
+	RSA *public_key;
 
 	/* Variable initialization */
-	cipher_text_len = decrypted_text_len = numberOfBlocks = 0;
+	cipher_text_len = decrypted_text_len = plain_text_len = 0;
 	strncpy((char *)&plaintext, (char *)(unsigned char *)"This text is huge and needs more than 1 block", BUFLEN);
+	plain_text_len = (int)strlen((const char *)plaintext);
+	private_key = rsa_read_key(C_PRV_KF, 0);
+	public_key = rsa_read_key(C_PUB_KF, 1);
 
 	/*----------------------------------------------Encrypt----------------------------------------------*/
-	rsa_prv_encrypt();
+	cipher_text_len = rsa_prv_encrypt(plaintext, plain_text_len, private_key, ciphertext, RSA_PKCS1_PADDING);
+	printf("Plaintext size: %d \t Ciphertext size: %d\n", plain_text_len, cipher_text_len);
+	print_hex(ciphertext, cipher_text_len);
 	/*----------------------------------------------Decrypt----------------------------------------------*/
-
+	decrypted_text_len = rsa_pub_decrypt(ciphertext, cipher_text_len, public_key, decryptedtext, RSA_PKCS1_PADDING);
+	printf("Decrypted text (%d) is:\n", decrypted_text_len);
+	printf("%s\n", decryptedtext);
 	return 0;
 }
 

@@ -128,8 +128,42 @@ unsigned char *aes_read_key(void)
 /*
  * retrieves an RSA key from the key file
  */
-RSA *rsa_read_key(char *kfile)
+RSA *rsa_read_key(char *kfile, int isPublic)
 {
+	FILE *rsa_key_file = fopen(kfile, "rb");
+	if (rsa_key_file == NULL)
+	{
+		perror("fopen ");
+		exit(EXIT_FAILURE);
+	}
+	RSA *rsa_key = RSA_new();
+
+	if (rsa_key == NULL)
+	{
+		perror("RSA new");
+		exit(EXIT_FAILURE);
+	}
+
+	if (isPublic)
+	{
+		rsa_key = PEM_read_RSA_PUBKEY(rsa_key_file, &rsa_key, NULL, NULL);
+		if (rsa_key == NULL)
+		{
+			printf("Error reading RSA public key from file %s\n", kfile);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		rsa_key = PEM_read_RSAPrivateKey(rsa_key_file, &rsa_key, NULL, NULL);
+		if (rsa_key == NULL)
+		{
+			printf("Error reading RSA private key from file %s\n", kfile);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return rsa_key;
 }
 
 /* ----------------------------- AES functions ------------------------------ */

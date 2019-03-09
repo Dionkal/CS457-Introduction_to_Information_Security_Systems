@@ -71,7 +71,7 @@ unsigned char *aes_read_key(void);
 /*
  * retrieves an RSA key from the key file
  */
-RSA *rsa_read_key(char *kfile);
+RSA *rsa_read_key(char *kfile, int isPublic);
 
 /* ----------------------------- AES functions ------------------------------ */
 
