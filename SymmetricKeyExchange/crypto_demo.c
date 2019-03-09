@@ -16,6 +16,8 @@ int main(int argc, char **argv)
 	unsigned char plaintext[BUFLEN] = {0};
 	unsigned char ciphertext[BUFLEN] = {0};
 	unsigned char decryptedtext[BUFLEN] = {0};
+	int plaintext_block_offset = 0;
+	int ciphertext_block_offset = 0;
 
 	/* Read key from file*/
 	key = aes_read_key();
@@ -26,11 +28,11 @@ int main(int argc, char **argv)
 	strncpy((char *)&plaintext, (char *)(unsigned char *)"HELLO", BUFLEN);
 
 	/* Determine the number of blocks required for the whole plaintext */
-	numberOfBlocks = (strlen((char *)&plaintext) < (AES_BS - 1)) ? 0 : (strlen((char *)&plaintext)) / (AES_BS - 1);
+	numberOfBlocks = (strlen((char *)&plaintext) < (AES_BS - 1)) ? 0 : (strlen((char *)&plaintext)) / (AES_BS);
 
-	printf("Plaintext lenght: %d / Block size: %d = Number of blocks: %d\n", (int)strlen((char *)&plaintext), AES_BS - 1, numberOfBlocks);
+	printf("Plaintext lenght: %d / Block size: %d = Number of blocks: %d\n", (int)strlen((char *)&plaintext), AES_BS, numberOfBlocks);
 	/*----------------------------------------------Encrypt----------------------------------------------*/
-	int plaintext_block_offset = 0;
+
 	for (size_t i = 0; i <= numberOfBlocks; i++)
 	{
 
@@ -44,7 +46,7 @@ int main(int argc, char **argv)
 	}
 
 	/*----------------------------------------------Decrypt----------------------------------------------*/
-	int ciphertext_block_offset = 0;
+
 	for (size_t i = 0; i <= numberOfBlocks; i++)
 	{
 		decrypted_text_len = aes_decrypt(ciphertext + ciphertext_block_offset, ciphertext_block_offset + AES_BS, key, NULL, decryptedtext + ciphertext_block_offset - (1 * i), AES_128_ECB);
