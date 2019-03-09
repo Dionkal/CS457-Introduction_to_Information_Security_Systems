@@ -93,25 +93,25 @@ int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *ke
  * RSA public key encryption
  */
 int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
-                    RSA *key, unsigned char *ciphertext);
+                    RSA *key, unsigned char *ciphertext, int padding_mode);
 
 /*
  * RSA private key decryption
  */
 int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                    RSA *key, unsigned char *plaintext);
+                    RSA *key, unsigned char *plaintext, int padding_mode);
 
 /*
  * RSA private key encryption
  */
 int rsa_prv_encrypt(unsigned char *plaintext, int plaintext_len,
-                    RSA *key, unsigned char *ciphertext);
+                    RSA *key, unsigned char *ciphertext, int padding_mode);
 
 /*
  * RSA public key decryption
  */
 int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                    RSA *key, unsigned char *plaintext);
+                    RSA *key, unsigned char *plaintext, int padding_mode);
 
 /*
  * RSA Public(Private) encryption

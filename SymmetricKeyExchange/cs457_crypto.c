@@ -217,32 +217,40 @@ int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *ke
  * RSA public key encryption
  */
 int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
-					RSA *key, unsigned char *ciphertext)
+					RSA *key, unsigned char *ciphertext, int padding_mode)
 {
+	int result = RSA_public_encrypt(plaintext_len, plaintext, ciphertext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA private key decryption
  */
 int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-					RSA *key, unsigned char *plaintext)
+					RSA *key, unsigned char *plaintext, int padding_mode)
 {
+	int result = RSA_private_decrypt(ciphertext_len, ciphertext, plaintext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA private key encryption
  */
 int rsa_prv_encrypt(unsigned char *plaintext, int plaintext_len,
-					RSA *key, unsigned char *ciphertext)
+					RSA *key, unsigned char *ciphertext, int padding_mode)
 {
+	int result = RSA_private_encrypt(plaintext_len, plaintext, ciphertext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA public key decryption
  */
 int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
-					RSA *key, unsigned char *plaintext)
+					RSA *key, unsigned char *plaintext, int padding_mode)
 {
+	int result = RSA_public_decrypt(ciphertext_len, ciphertext, plaintext, key, padding_mode);
+	return result;
 }
 
 /*
