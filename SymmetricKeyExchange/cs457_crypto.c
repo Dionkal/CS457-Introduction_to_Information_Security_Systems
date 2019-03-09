@@ -322,17 +322,17 @@ int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 	unsigned char intermediatetext[BUFLEN] = {0};
 	int intermediate_len = 0;
 
-	intermediate_len = rsa_pub_decrypt(ciphertext, ciphertext_len, pub_k, intermediatetext, padding_mode_1);
+	intermediate_len = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, intermediatetext, padding_mode_1);
 
 	/* TODO: Remove debug prints */
 	printf("Public decryption: %d\n", intermediate_len);
 	print_hex(intermediatetext, intermediate_len);
 
-	int result = rsa_prv_decrypt(intermediatetext, intermediate_len, priv_k, plaintext, padding_mode_2);
+	int result = rsa_pub_decrypt(intermediatetext, intermediate_len, pub_k, plaintext, padding_mode_2);
 
 	/* TODO: Remove debug prints */
 	printf("Private decryption: %d\n", result);
-	print_hex(plaintext, result);
+	printf("%s\n", plaintext);
 
 	memset(intermediatetext, 0, BUFLEN);
 
