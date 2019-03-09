@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 	/* Variable initialization */
 	cipher_text_len = decrypted_text_len = numberOfBlocks = 0;
-	strncpy((char *)&plaintext, (char *)(unsigned char *)"This text is huge and needs more than 1 block", BUFLEN);
+	strncpy((char *)&plaintext, (char *)(unsigned char *)"HELLO. Is that me you're looking for", BUFLEN);
 
 	/* Determine the number of blocks required for the whole plaintext */
 	numberOfBlocks = (strlen((char *)&plaintext) < (AES_BS - 1)) ? 1 : (strlen((char *)&plaintext)) / (AES_BS - 1);
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	printf("Plaintext lenght: %d / Block size: %d = Number of blocks: %d\n", (int)strlen((char *)&plaintext), AES_BS - 1, numberOfBlocks);
 	/*----------------------------------------------Encrypt----------------------------------------------*/
 	int plaintext_block_offset = 0;
-	for (size_t i = 0; i < numberOfBlocks; i++)
+	for (size_t i = 0; i <= numberOfBlocks; i++)
 	{
 
 		cipher_text_len = aes_encrypt(plaintext + plaintext_block_offset, plaintext_block_offset + (AES_BS - 1), key, NULL, ciphertext + plaintext_block_offset + (1 * i), AES_128_ECB);
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
 	/*----------------------------------------------Decrypt----------------------------------------------*/
 	int ciphertext_block_offset = 0;
-	for (size_t i = 0; i < numberOfBlocks; i++)
+	for (size_t i = 0; i <= numberOfBlocks; i++)
 	{
 		decrypted_text_len = aes_decrypt(ciphertext + ciphertext_block_offset, ciphertext_block_offset + AES_BS, key, NULL, decryptedtext + ciphertext_block_offset - (1 * i), AES_128_ECB);
 		ciphertext_block_offset += AES_BS;
