@@ -293,6 +293,7 @@ int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext)
 {
+	return 0;
 }
 
 /*
@@ -301,6 +302,7 @@ int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext)
 {
+	return 0;
 }
 
 /* EOF */
