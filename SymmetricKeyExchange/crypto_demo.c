@@ -19,13 +19,14 @@ int main(int argc, char **argv)
 
 	/* Read key from file*/
 	key = aes_read_key();
+	printf("AES key:%s\n", key);
 
 	/* Variable initialization */
 	cipher_text_len = decrypted_text_len = numberOfBlocks = 0;
-	strncpy((char *)&plaintext, (char *)(unsigned char *)"HELLO. Is that me you're looking for", BUFLEN);
+	strncpy((char *)&plaintext, (char *)(unsigned char *)"HELLO", BUFLEN);
 
 	/* Determine the number of blocks required for the whole plaintext */
-	numberOfBlocks = (strlen((char *)&plaintext) < (AES_BS - 1)) ? 1 : (strlen((char *)&plaintext)) / (AES_BS - 1);
+	numberOfBlocks = (strlen((char *)&plaintext) < (AES_BS - 1)) ? 0 : (strlen((char *)&plaintext)) / (AES_BS - 1);
 
 	printf("Plaintext lenght: %d / Block size: %d = Number of blocks: %d\n", (int)strlen((char *)&plaintext), AES_BS - 1, numberOfBlocks);
 	/*----------------------------------------------Encrypt----------------------------------------------*/
