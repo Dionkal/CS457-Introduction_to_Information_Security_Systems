@@ -28,10 +28,15 @@ int main(int argc, char **argv)
 	cipher_text_len = rsa_prv_encrypt(plaintext, plain_text_len, private_key, ciphertext, RSA_PKCS1_PADDING);
 	printf("Plaintext size: %d \t Ciphertext size: %d\n", plain_text_len, cipher_text_len);
 	print_hex(ciphertext, cipher_text_len);
+
+	decrypted_text_len = rsa_pub_encrypt(ciphertext, cipher_text_len, public_key, decryptedtext, RSA_PKCS1_PADDING);
+	printf("Double Ciphertext size: %d\n", decrypted_text_len);
+	print_hex(decryptedtext, decrypted_text_len);
+
 	/*----------------------------------------------Decrypt----------------------------------------------*/
-	decrypted_text_len = rsa_pub_decrypt(ciphertext, cipher_text_len, public_key, decryptedtext, RSA_PKCS1_PADDING);
+	/*decrypted_text_len = rsa_pub_decrypt(ciphertext, cipher_text_len, public_key, decryptedtext, RSA_PKCS1_PADDING);
 	printf("Decrypted text (%d) is:\n", decrypted_text_len);
-	printf("%s\n", decryptedtext);
+	printf("%s\n", decryptedtext);*/
 	return 0;
 }
 
