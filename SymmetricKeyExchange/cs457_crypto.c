@@ -26,11 +26,11 @@
 #define BUFLEN 2048
 
 /* key files*/
-#define AES_KF "keys/aes_key.txt"
-#define S_PUB_KF "keys/srv_pub.pem"
-#define S_PRV_KF "keys/srv_priv.pem"
-#define C_PUB_KF "keys/cli_pub.pem"
-#define C_PRV_KF "keys/cli_priv.pem"
+#define AES_KF "../keys/aes_key.txt"
+#define S_PUB_KF "../keys/srv_pub.pem"
+#define S_PRV_KF "../keys/srv_priv.pem"
+#define C_PUB_KF "../keys/cli_pub.pem"
+#define C_PRV_KF "../keys/cli_priv.pem"
 
 /* AES block size */
 #define AES_BS 16
@@ -132,8 +132,42 @@ unsigned char *aes_read_key(void)
 /*
  * retrieves an RSA key from the key file
  */
-RSA *rsa_read_key(char *kfile)
+RSA *rsa_read_key(char *kfile, int isPublic)
 {
+	FILE *rsa_key_file = fopen(kfile, "rb");
+	if (rsa_key_file == NULL)
+	{
+		perror("fopen ");
+		exit(EXIT_FAILURE);
+	}
+	RSA *rsa_key = RSA_new();
+
+	if (rsa_key == NULL)
+	{
+		perror("RSA new");
+		exit(EXIT_FAILURE);
+	}
+
+	if (isPublic)
+	{
+		rsa_key = PEM_read_RSA_PUBKEY(rsa_key_file, &rsa_key, NULL, NULL);
+		if (rsa_key == NULL)
+		{
+			printf("Error reading RSA public key from file %s\n", kfile);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		rsa_key = PEM_read_RSAPrivateKey(rsa_key_file, &rsa_key, NULL, NULL);
+		if (rsa_key == NULL)
+		{
+			printf("Error reading RSA private key from file %s\n", kfile);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	return rsa_key;
 }
 
 /* ----------------------------- AES functions ------------------------------ */
@@ -278,48 +312,92 @@ int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *ke
  * RSA public key encryption
  */
 int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
-					RSA *key, unsigned char *ciphertext)
+					RSA *key, unsigned char *ciphertext, int padding_mode)
 {
+	int result = RSA_public_encrypt(plaintext_len, plaintext, ciphertext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA private key decryption
  */
 int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-					RSA *key, unsigned char *plaintext)
+					RSA *key, unsigned char *plaintext, int padding_mode)
 {
+	int result = RSA_private_decrypt(ciphertext_len, ciphertext, plaintext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA private key encryption
  */
 int rsa_prv_encrypt(unsigned char *plaintext, int plaintext_len,
-					RSA *key, unsigned char *ciphertext)
+					RSA *key, unsigned char *ciphertext, int padding_mode)
 {
+	int result = RSA_private_encrypt(plaintext_len, plaintext, ciphertext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA public key decryption
  */
 int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
-					RSA *key, unsigned char *plaintext)
+					RSA *key, unsigned char *plaintext, int padding_mode)
 {
+	int result = RSA_public_decrypt(ciphertext_len, ciphertext, plaintext, key, padding_mode);
+	return result;
 }
 
 /*
  * RSA Public(Private) encryption
  */
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
-						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext)
+						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext, int padding_mode_1, int padding_mode_2)
 {
+	unsigned char intermediatetext[BUFLEN] = {0};
+	int intermediate_len = 0;
+
+	intermediate_len = rsa_prv_encrypt(plaintext, plaintext_len, priv_k, intermediatetext, padding_mode_1);
+
+	/* TODO: Remove debug prints */
+	printf("Private encryption: %d\n", intermediate_len);
+	print_hex(intermediatetext, intermediate_len);
+
+	int result = rsa_pub_encrypt(intermediatetext, intermediate_len, pub_k, ciphertext, padding_mode_2);
+
+	/* TODO: Remove debug prints */
+	printf("Public encryption: %d\n", result);
+	print_hex(ciphertext, result);
+
+	memset(intermediatetext, 0, BUFLEN);
+
+	return result;
 }
 
 /*
  * RSA Public(Private) decryption
  */
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext)
+						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext, int padding_mode_1, int padding_mode_2)
 {
+	unsigned char intermediatetext[BUFLEN] = {0};
+	int intermediate_len = 0;
+
+	intermediate_len = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, intermediatetext, padding_mode_1);
+
+	/* TODO: Remove debug prints */
+	printf("Public decryption: %d\n", intermediate_len);
+	print_hex(intermediatetext, intermediate_len);
+
+	int result = rsa_pub_decrypt(intermediatetext, intermediate_len, pub_k, plaintext, padding_mode_2);
+
+	/* TODO: Remove debug prints */
+	printf("Private decryption: %d\n", result);
+	printf("%s\n", plaintext);
+
+	memset(intermediatetext, 0, BUFLEN);
+
+	return result;
 }
 
 /* EOF */

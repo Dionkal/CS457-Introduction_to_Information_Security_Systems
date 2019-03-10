@@ -71,7 +71,7 @@ unsigned char *aes_read_key(void);
 /*
  * retrieves an RSA key from the key file
  */
-RSA *rsa_read_key(char *kfile);
+RSA *rsa_read_key(char *kfile, int isPublic);
 
 /* ----------------------------- AES functions ------------------------------ */
 
@@ -105,37 +105,37 @@ int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *ke
  * RSA public key encryption
  */
 int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
-                    RSA *key, unsigned char *ciphertext);
+                    RSA *key, unsigned char *ciphertext, int padding_mode);
 
 /*
  * RSA private key decryption
  */
 int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                    RSA *key, unsigned char *plaintext);
+                    RSA *key, unsigned char *plaintext, int padding_mode);
 
 /*
  * RSA private key encryption
  */
 int rsa_prv_encrypt(unsigned char *plaintext, int plaintext_len,
-                    RSA *key, unsigned char *ciphertext);
+                    RSA *key, unsigned char *ciphertext, int padding_mode);
 
 /*
  * RSA public key decryption
  */
 int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                    RSA *key, unsigned char *plaintext);
+                    RSA *key, unsigned char *plaintext, int padding_mode);
 
 /*
  * RSA Public(Private) encryption
  */
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
-                         RSA *pub_k, RSA *priv_k, unsigned char *ciphertext);
+                         RSA *pub_k, RSA *priv_k, unsigned char *ciphertext, int padding_mode_1, int padding_mode_2);
 
 /*
  * RSA Public(Private) decryption
  */
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-                         RSA *pub_k, RSA *priv_k, unsigned char *plaintext);
+                         RSA *pub_k, RSA *priv_k, unsigned char *plaintext, int padding_mode_1, int padding_mode_2);
 
 #endif /* _CS457_CRYPTO_H_ */
 
