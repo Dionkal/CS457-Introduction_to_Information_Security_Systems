@@ -37,7 +37,7 @@
 #define AES_BS 16
 
 /*Uncomment for verbose output*/
-#define DEBUG
+// #define DEBUG
 
 /* --------------------------- conversion helpers --------------------------- */
 
@@ -360,16 +360,16 @@ int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 
 	intermediate_len = rsa_prv_encrypt(plaintext, plaintext_len, priv_k, intermediatetext, padding_mode_1);
 
-	/* TODO: Remove debug prints */
+#ifdef DEBUG
 	printf("Private encryption: %d\n", intermediate_len);
 	print_hex(intermediatetext, intermediate_len);
-
+#endif
 	int result = rsa_pub_encrypt(intermediatetext, intermediate_len, pub_k, ciphertext, padding_mode_2);
 
-	/* TODO: Remove debug prints */
+#ifdef DEBUG
 	printf("Public encryption: %d\n", result);
 	print_hex(ciphertext, result);
-
+#endif
 	memset(intermediatetext, 0, BUFLEN);
 
 	return result;
@@ -386,16 +386,16 @@ int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 
 	intermediate_len = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, intermediatetext, padding_mode_1);
 
-	/* TODO: Remove debug prints */
+#ifdef DEBUG
 	printf("Private decryption: %d\n", intermediate_len);
 	print_hex(intermediatetext, intermediate_len);
-
+#endif
 	int result = rsa_pub_decrypt(intermediatetext, intermediate_len, pub_k, plaintext, padding_mode_2);
 
-	/* TODO: Remove debug prints */
+#ifdef DEBUG
 	printf("Public decryption: %d\n", result);
 	printf("%s\n", plaintext);
-
+#endif
 	memset(intermediatetext, 0, BUFLEN);
 
 	return result;

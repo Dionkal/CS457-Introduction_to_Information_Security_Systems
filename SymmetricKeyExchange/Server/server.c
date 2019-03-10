@@ -145,13 +145,16 @@ int main(int argc, char *argv[])
 	}
 
 	/* wait for a key exchange init */
-	if (read(sockcl, ciphertext, 256) < 0)
+	rxb = read(sockcl, ciphertext, 256);
+	if (rxb < 0)
 	{
 		perror("read");
 		exit(EXIT_FAILURE);
 	}
 
-	cipher_len = BUFLEN;
+	printf("Recieved %d bytes in hex:\n", (int)rxb);
+	print_hex(ciphertext, rxb);
+	cipher_len = rxb;
 	plain_len = rsa_pub_priv_decrypt(ciphertext, 256, c_pub_key, s_prv_key, plaintext, RSA_NO_PADDING, RSA_PKCS1_PADDING);
 	printf("Plaintext form: %d\n", plain_len);
 	printf("%s", plaintext);

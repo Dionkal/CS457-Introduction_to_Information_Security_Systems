@@ -157,12 +157,14 @@ int main(int argc, char *argv[])
 	plain_len = strlen((const char *)plaintext);
 	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
 
-	if (send(cfd, ciphertext, 256, 0) < 0)
+	txb = send(cfd, ciphertext, 256, 0);
+	if (txb < 0)
 	{
 		perror("send");
 		exit(EXIT_FAILURE);
 	}
-	printf("Sent: \"%s\"\n", msg);
+	printf("Sent %d bytes in hex:\n", (int)txb);
+	print_hex(ciphertext, txb);
 	/*
    * receive the key from the server,
    * decrypt it and register it
