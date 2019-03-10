@@ -25,14 +25,14 @@ int main(int argc, char **argv)
 	strncpy((char *)&plaintext, (char *)(unsigned char *)"I'm sitting here alone in darkness. Waiting to be free. Lonely and forlorn I am crying. I long for my time to come. Death means just life. Please let me die in solitude", BUFLEN);
 	plain_text_len = (int)strlen((const char *)plaintext);
 	private_key1 = rsa_read_key(C_PRV_KF, 0);
-	public_key2 = rsa_read_key(C_PUB_KF, 1);
+	public_key1 = rsa_read_key(C_PUB_KF, 1);
 
 	private_key2 = rsa_read_key(S_PRV_KF, 0);
-	public_key1 = rsa_read_key(S_PUB_KF, 1);
+	public_key2 = rsa_read_key(S_PUB_KF, 1);
 
 	/*----------------------------------------------Encrypt----------------------------------------------*/
 	printf("----------------------------------------------Encrypt----------------------------------------------\n");
-	decrypted_text_len = rsa_pub_priv_encrypt(plaintext, plain_text_len, public_key2, private_key1, decryptedtext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
+	decrypted_text_len = rsa_pub_priv_encrypt(plaintext, plain_text_len, public_key1, private_key1, decryptedtext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
 
 	memset(plaintext, 0, BUFLEN);
 	memset(ciphertext, 0, BUFLEN);
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
 	/*----------------------------------------------Decrypt----------------------------------------------*/
 	printf("----------------------------------------------Decrypt----------------------------------------------\n");
-	rsa_pub_priv_decrypt(decryptedtext, decrypted_text_len, public_key1, private_key2, plaintext, RSA_NO_PADDING, RSA_PKCS1_PADDING);
+	rsa_pub_priv_decrypt(decryptedtext, decrypted_text_len, public_key2, private_key2, plaintext, RSA_NO_PADDING, RSA_PKCS1_PADDING);
 
 	return 0;
 }
