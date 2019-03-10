@@ -7,6 +7,8 @@
 #include <openssl/pem.h>
 #include <openssl/err.h>
 
+#include "cs457_crypto.h"
+
 /* error reporting helpers */
 #define ERRX(ret, str)             \
 	do                             \
@@ -33,6 +35,9 @@
 
 /* AES block size */
 #define AES_BS 16
+
+/*Uncomment for verbose output*/
+#define DEBUG
 
 /* --------------------------- conversion helpers --------------------------- */
 
@@ -106,7 +111,7 @@ void print_hex(unsigned char *data, size_t len)
  */
 unsigned char *aes_read_key(void)
 {
-	unsigned char **key = NULL;
+	unsigned char *key = NULL;
 	FILE *aes_key_file = fopen(AES_KF, "r");
 	if (aes_key_file == NULL)
 	{
@@ -167,6 +172,63 @@ RSA *rsa_read_key(char *kfile, int isPublic)
 }
 
 /* ----------------------------- AES functions ------------------------------ */
+
+/*
+ * Segments the plaintext into blocks of AES_BS -1 size and performs AES 128 ecb
+ */
+int aes_ecb_block_encrypt(unsigned char *plaintext, int plaintext_length, unsigned char *key,
+						  unsigned char *iv, unsigned char *ciphertext, unsigned int mode)
+{
+	unsigned int numberOfBlocks = 0;
+	int plaintext_block_offset = 0;
+	int cipher_text_len = 0;
+
+	if (plaintext_length < 1)
+		return -1;
+
+	numberOfBlocks = (plaintext_length - 1) / (AES_BS);
+
+	for (size_t i = 0; i <= numberOfBlocks; i++)
+	{
+		cipher_text_len = aes_encrypt(plaintext + plaintext_block_offset, plaintext_block_offset + (AES_BS - 1), key, NULL, ciphertext + plaintext_block_offset + (1 * i), mode);
+
+#ifdef DEBUG
+		printf("Block#%d (block offset: %d)\n:", (int)i + 1, plaintext_block_offset);
+		print_hex(ciphertext, cipher_text_len);
+		printf("Plaintext size: %d \n",
+			   plaintext_block_offset + (AES_BS - 1));
+		printf("Ciphertext len: %d\n", cipher_text_len);
+#endif
+
+		plaintext_block_offset += AES_BS - 1;
+	}
+	return numberOfBlocks;
+}
+
+/*
+ * Segments the ciphertext into blocks of AES_BS size and decrypts AES 128 ecb to plaintext
+ */
+int aes_ecb_block_decrypt(unsigned char *ciphertext, int numberOfBlocks, unsigned char *key,
+						  unsigned char *iv, unsigned char *plaintext, unsigned int mode)
+{
+
+	int ciphertext_block_offset = 0;
+	int decrypted_text_len = 0;
+
+	for (size_t i = 0; i <= numberOfBlocks; i++)
+	{
+		decrypted_text_len = aes_decrypt(ciphertext + ciphertext_block_offset, ciphertext_block_offset + AES_BS, key, NULL, plaintext + ciphertext_block_offset - (1 * i), mode);
+		ciphertext_block_offset += AES_BS;
+	}
+
+#ifdef DEBUG
+	plaintext[decrypted_text_len] = '\0';
+	printf("Decrypted text :\n");
+	printf("%s\n", plaintext);
+	printf("Decrypted text lenght: %d\n", decrypted_text_len);
+#endif
+	return decrypted_text_len;
+}
 
 /*Function dispather for different modes of aes*/
 const EVP_CIPHER *(*EncryptionFunctionDispatcher[])() = {EVP_aes_128_ecb, EVP_aes_128_cbc};
@@ -293,24 +355,23 @@ int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext, int padding_mode_1, int padding_mode_2)
 {
-	unsigned char intermediatetext[BUFLEN] = {0};
-	int intermediate_len = 0;
+	int cipher_lenght = 0;
 
-	intermediate_len = rsa_prv_encrypt(plaintext, plaintext_len, priv_k, intermediatetext, padding_mode_1);
+	cipher_lenght = rsa_prv_encrypt(plaintext, strlen((const char *)plaintext), priv_k, ciphertext, RSA_PKCS1_PADDING);
 
-	/* TODO: Remove debug prints */
-	printf("Private encryption: %d\n", intermediate_len);
-	print_hex(intermediatetext, intermediate_len);
+#ifdef DEBUG
+	printf("Private encryption: %d\n", cipher_lenght);
+	print_hex(ciphertext, cipher_lenght);
+#endif
 
-	int result = rsa_pub_encrypt(intermediatetext, intermediate_len, pub_k, ciphertext, padding_mode_2);
+	cipher_lenght = rsa_pub_encrypt(ciphertext, cipher_lenght, pub_k, ciphertext, RSA_NO_PADDING);
 
-	/* TODO: Remove debug prints */
-	printf("Public encryption: %d\n", result);
-	print_hex(ciphertext, result);
+#ifdef DEBUG
+	printf("Public encryption: %d\n", cipher_lenght);
+	print_hex(ciphertext, cipher_lenght);
+#endif
 
-	memset(intermediatetext, 0, BUFLEN);
-
-	return result;
+	return cipher_lenght;
 }
 
 /*
@@ -319,24 +380,22 @@ int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext, int padding_mode_1, int padding_mode_2)
 {
-	unsigned char intermediatetext[BUFLEN] = {0};
-	int intermediate_len = 0;
+	int length = 0;
 
-	intermediate_len = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, intermediatetext, padding_mode_1);
+	length = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, ciphertext, RSA_NO_PADDING);
 
-	/* TODO: Remove debug prints */
-	printf("Public decryption: %d\n", intermediate_len);
-	print_hex(intermediatetext, intermediate_len);
+#ifdef DEBUG
+	printf("Private decryption: %d\n", length);
+	print_hex(ciphertext, length);
+#endif
+	length = rsa_pub_decrypt(ciphertext, length, pub_k, plaintext, RSA_PKCS1_PADDING);
 
-	int result = rsa_pub_decrypt(intermediatetext, intermediate_len, pub_k, plaintext, padding_mode_2);
-
-	/* TODO: Remove debug prints */
-	printf("Private decryption: %d\n", result);
+#ifdef DEBUG
+	printf("Public decryption: %d\n", length);
 	printf("%s\n", plaintext);
+#endif
 
-	memset(intermediatetext, 0, BUFLEN);
-
-	return result;
+	return length;
 }
 
 /* EOF */
