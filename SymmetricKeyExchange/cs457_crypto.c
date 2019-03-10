@@ -6,6 +6,7 @@
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+#include "cs457_crypto.h"
 
 /* error reporting helpers */
 #define ERRX(ret, str)             \
@@ -33,6 +34,9 @@
 
 /* AES block size */
 #define AES_BS 16
+
+/*Uncomment for verbose output*/
+#define DEBUG
 
 /* --------------------------- conversion helpers --------------------------- */
 
@@ -106,7 +110,7 @@ void print_hex(unsigned char *data, size_t len)
  */
 unsigned char *aes_read_key(void)
 {
-	unsigned char **key = NULL;
+	unsigned char *key = NULL;
 	FILE *aes_key_file = fopen(AES_KF, "r");
 	if (aes_key_file == NULL)
 	{
@@ -133,6 +137,60 @@ RSA *rsa_read_key(char *kfile)
 }
 
 /* ----------------------------- AES functions ------------------------------ */
+
+/*
+ * Segments the plaintext into blocks of AES_BS -1 size and performs AES 128 ecb
+ */
+int aes_ecb_block_encrypt(unsigned char *plaintext, int plaintext_length, unsigned char *key,
+						  unsigned char *iv, unsigned char *ciphertext, unsigned int mode)
+{
+	unsigned int numberOfBlocks = 0;
+	int plaintext_block_offset = 0;
+	int cipher_text_len = 0;
+
+	numberOfBlocks = plaintext_length / (AES_BS);
+
+	for (size_t i = 0; i <= numberOfBlocks; i++)
+	{
+		cipher_text_len = aes_encrypt(plaintext + plaintext_block_offset, plaintext_block_offset + (AES_BS - 1), key, NULL, ciphertext + plaintext_block_offset + (1 * i), mode);
+
+#ifdef DEBUG
+		printf("Block#%d (block offset: %d)\n:", (int)i + 1, plaintext_block_offset);
+		print_hex(ciphertext, cipher_text_len);
+		printf("Plaintext size: %d \n",
+			   plaintext_block_offset + (AES_BS - 1));
+		printf("Ciphertext len: %d\n", cipher_text_len);
+#endif
+
+		plaintext_block_offset += AES_BS - 1;
+	}
+	return cipher_text_len;
+}
+
+/*
+ * Segments the ciphertext into blocks of AES_BS size and decrypts AES 128 ecb to plaintext
+ */
+int aes_ecb_block_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+						  unsigned char *iv, unsigned char *plaintext, unsigned int mode)
+{
+	unsigned int numberOfBlocks = 0;
+	int ciphertext_block_offset = 0;
+	int decrypted_text_len = 0;
+
+	for (size_t i = 0; i <= numberOfBlocks; i++)
+	{
+		decrypted_text_len = aes_decrypt(ciphertext + ciphertext_block_offset, ciphertext_block_offset + AES_BS, key, NULL, plaintext + ciphertext_block_offset - (1 * i), mode);
+		ciphertext_block_offset += AES_BS;
+	}
+
+#ifdef DEBUG
+	plaintext[decrypted_text_len] = '\0';
+	printf("Decrypted text :\n");
+	printf("%s\n", plaintext);
+	printf("Decrypted text lenght: %d\n", decrypted_text_len);
+#endif
+	return decrypted_text_len;
+}
 
 /*Function dispather for different modes of aes*/
 const EVP_CIPHER *(*EncryptionFunctionDispatcher[])() = {EVP_aes_128_ecb, EVP_aes_128_cbc};

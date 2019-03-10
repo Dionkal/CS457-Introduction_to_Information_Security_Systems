@@ -76,6 +76,18 @@ RSA *rsa_read_key(char *kfile);
 /* ----------------------------- AES functions ------------------------------ */
 
 /*
+ * Segments the plaintext into blocks of AES_BS -1 size and performs AES 128 ecb
+ */
+int aes_ecb_block_encrypt(unsigned char *plaintext, int plaintext_length, unsigned char *key,
+                          unsigned char *iv, unsigned char *ciphertext, unsigned int mode);
+
+/*
+ * Segments the ciphertext into blocks of AES_BS size and decrypts AES 128 ecb to plaintext
+ */
+int aes_ecb_block_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+                          unsigned char *iv, unsigned char *plaintext, unsigned int mode);
+
+/*
  * encrypts the data with 128-bit AES ECB
  */
 int aes_encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
