@@ -148,7 +148,10 @@ int aes_ecb_block_encrypt(unsigned char *plaintext, int plaintext_length, unsign
 	int plaintext_block_offset = 0;
 	int cipher_text_len = 0;
 
-	numberOfBlocks = plaintext_length / (AES_BS);
+	if (plaintext_length < 1)
+		return -1;
+
+	numberOfBlocks = (plaintext_length - 1) / (AES_BS);
 
 	for (size_t i = 0; i <= numberOfBlocks; i++)
 	{
@@ -164,16 +167,16 @@ int aes_ecb_block_encrypt(unsigned char *plaintext, int plaintext_length, unsign
 
 		plaintext_block_offset += AES_BS - 1;
 	}
-	return cipher_text_len;
+	return numberOfBlocks;
 }
 
 /*
  * Segments the ciphertext into blocks of AES_BS size and decrypts AES 128 ecb to plaintext
  */
-int aes_ecb_block_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+int aes_ecb_block_decrypt(unsigned char *ciphertext, int numberOfBlocks, unsigned char *key,
 						  unsigned char *iv, unsigned char *plaintext, unsigned int mode)
 {
-	unsigned int numberOfBlocks = 0;
+
 	int ciphertext_block_offset = 0;
 	int decrypted_text_len = 0;
 

@@ -84,7 +84,7 @@ int aes_ecb_block_encrypt(unsigned char *plaintext, int plaintext_length, unsign
 /*
  * Segments the ciphertext into blocks of AES_BS size and decrypts AES 128 ecb to plaintext
  */
-int aes_ecb_block_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+int aes_ecb_block_decrypt(unsigned char *ciphertext, int numberOfBlocks, unsigned char *key,
                           unsigned char *iv, unsigned char *plaintext, unsigned int mode);
 
 /*
