@@ -353,7 +353,7 @@ int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
  * RSA Public(Private) encryption
  */
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
-						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext, int padding_mode_1, int padding_mode_2)
+						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext)
 {
 	int cipher_lenght = 0;
 
@@ -378,7 +378,7 @@ int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
  * RSA Public(Private) decryption
  */
 int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
-						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext, int padding_mode_1, int padding_mode_2)
+						 RSA *pub_k, RSA *priv_k, unsigned char *plaintext)
 {
 	int length = 0;
 

@@ -22,7 +22,7 @@ Sample Execution:
 
 tty1 $ ./server [-p <port>]
 
-tty2 $ ./client -i 127.0.0.1 -p 3613 -m hello_from_cs457
+tty2 $ ./Client/client -i 127.0.0.1 -p 3613 -m hello friend
 
 
 

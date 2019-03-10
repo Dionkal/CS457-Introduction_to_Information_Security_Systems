@@ -71,22 +71,22 @@ void closeSocket(int fd)
  */
 int main(int argc, char *argv[])
 {
-	int cfd;						  /* comm file descriptor	 */
-	int port;						  /* server port		 */
-	int err;						  /* errors		 */
-	int opt;						  /* cmd options		 */
-	int plain_len;					  /* plaintext size	 */
-	int cipher_len;					  /* ciphertext size	 */
-	size_t rxb;						  /* received bytes	 */
-	size_t txb;						  /* transmitted bytes	 */
-	char *sip;						  /* server IP		 */
-	struct sockaddr_in srv_addr;	  /* server socket address */
-	unsigned char *msg;				  /* message to server	 */
-	unsigned char *aes_key;			  /* AES key		 */
-	unsigned char plaintext[BUFLEN];  /* plaintext buffer	 */
-	unsigned char ciphertext[BUFLEN]; /* plaintext buffer	 */
-	RSA *c_prv_key;					  /* client private key	 */
-	RSA *s_pub_key;					  /* server public key	 */
+	int cfd;								/* comm file descriptor	 */
+	int port;								/* server port		 */
+	int err;								/* errors		 */
+	int opt;								/* cmd options		 */
+	int plain_len;							/* plaintext size	 */
+	int cipher_len;							/* ciphertext size	 */
+	size_t rxb;								/* received bytes	 */
+	size_t txb;								/* transmitted bytes	 */
+	char *sip;								/* server IP		 */
+	struct sockaddr_in srv_addr;			/* server socket address */
+	unsigned char *msg;						/* message to server	 */
+	unsigned char *aes_key;					/* AES key		 */
+	unsigned char plaintext[BUFLEN] = {0};  /* plaintext buffer	 */
+	unsigned char ciphertext[BUFLEN] = {0}; /* plaintext buffer	 */
+	RSA *c_prv_key;							/* client private key	 */
+	RSA *s_pub_key;							/* server public key	 */
 
 	/* initialize */
 	cfd = -1;
@@ -155,9 +155,9 @@ int main(int argc, char *argv[])
    * and send it to the server
    */
 	plain_len = strlen((const char *)plaintext);
-	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
+	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext);
 
-	txb = send(cfd, ciphertext, 256, 0);
+	txb = send(cfd, ciphertext, cipher_len, 0);
 	if (txb < 0)
 	{
 		perror("send");

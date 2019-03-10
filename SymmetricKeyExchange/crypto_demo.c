@@ -12,7 +12,6 @@ int main(int argc, char **argv)
 {
 	int plain_text_len, decrypted_text_len;
 	unsigned char plaintext[BUFLEN] = {0};
-	unsigned char rsa_signature[BUFLEN] = {0};
 	unsigned char rsa_encryption[BUFLEN] = {0};
 	RSA *private_key1;
 	RSA *private_key2;
@@ -31,11 +30,11 @@ int main(int argc, char **argv)
 
 	/*----------------------------------------------Encrypt----------------------------------------------*/
 	printf("----------------------------------------------Encrypt----------------------------------------------\n");
-	decrypted_text_len = rsa_pub_priv_encrypt(plaintext, plain_text_len, public_key2, private_key1, rsa_encryption, RSA_PKCS1_PADDING, RSA_NO_PADDING);
+	decrypted_text_len = rsa_pub_priv_encrypt(plaintext, plain_text_len, public_key2, private_key1, rsa_encryption);
 	/*----------------------------------------------Decrypt----------------------------------------------*/
 	printf("----------------------------------------------Decrypt----------------------------------------------\n");
 	memset(plaintext, 0, BUFLEN);
-	rsa_pub_priv_decrypt(rsa_encryption, decrypted_text_len, public_key1, private_key2, plaintext, RSA_NO_PADDING, RSA_PKCS1_PADDING);
+	rsa_pub_priv_decrypt(rsa_encryption, decrypted_text_len, public_key1, private_key2, plaintext);
 	return 0;
 }
 

@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 	printf("Recieved %d bytes in hex:\n", (int)rxb);
 	print_hex(ciphertext, rxb);
 	cipher_len = rxb;
-	plain_len = rsa_pub_priv_decrypt(ciphertext, 256, c_pub_key, s_prv_key, plaintext, RSA_NO_PADDING, RSA_PKCS1_PADDING);
+	plain_len = rsa_pub_priv_decrypt(ciphertext, cipher_len, c_pub_key, s_prv_key, plaintext);
 	printf("Plaintext form: %d\n", plain_len);
 	printf("%s", plaintext);
 
