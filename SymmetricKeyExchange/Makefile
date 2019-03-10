@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS =  -Wall -pedantic -g
+CFLAGS =  -Wall -pedantic -std=c99 -g
 LIBSSL = -lssl -lcrypto
 
 TARGETS = server client demo
