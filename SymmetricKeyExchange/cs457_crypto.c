@@ -6,6 +6,7 @@
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+
 #include "cs457_crypto.h"
 
 /* error reporting helpers */
@@ -26,11 +27,11 @@
 #define BUFLEN 2048
 
 /* key files*/
-#define AES_KF "../keys/aes_key.txt"
-#define S_PUB_KF "../keys/srv_pub.pem"
-#define S_PRV_KF "../keys/srv_priv.pem"
-#define C_PUB_KF "../keys/cli_pub.pem"
-#define C_PRV_KF "../keys/cli_priv.pem"
+#define AES_KF "keys/aes_key.txt"
+#define S_PUB_KF "keys/srv_pub.pem"
+#define S_PRV_KF "keys/srv_priv.pem"
+#define C_PUB_KF "keys/cli_pub.pem"
+#define C_PRV_KF "keys/cli_priv.pem"
 
 /* AES block size */
 #define AES_BS 16
@@ -386,13 +387,13 @@ int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 	intermediate_len = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, intermediatetext, padding_mode_1);
 
 	/* TODO: Remove debug prints */
-	printf("Public decryption: %d\n", intermediate_len);
+	printf("Private decryption: %d\n", intermediate_len);
 	print_hex(intermediatetext, intermediate_len);
 
 	int result = rsa_pub_decrypt(intermediatetext, intermediate_len, pub_k, plaintext, padding_mode_2);
 
 	/* TODO: Remove debug prints */
-	printf("Private decryption: %d\n", result);
+	printf("Public decryption: %d\n", result);
 	printf("%s\n", plaintext);
 
 	memset(intermediatetext, 0, BUFLEN);

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 
 #include "../cs457_crypto.h"
 
@@ -148,16 +149,15 @@ int main(int argc, char *argv[])
 	s_pub_key = rsa_read_key(S_PUB_KF, 1);
 
 	/* perform the AES key exchange */
-	plain_len = strlen((const char *)plaintext);
-	rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
+
 	/*
    * encrypt the init message
    * and send it to the server
    */
 	plain_len = strlen((const char *)plaintext);
-	rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
+	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext, RSA_PKCS1_PADDING, RSA_NO_PADDING);
 
-	if (send(cfd, msg, strlen(msg) + 1, 0) < 0)
+	if (send(cfd, ciphertext, 256, 0) < 0)
 	{
 		perror("send");
 		exit(EXIT_FAILURE);

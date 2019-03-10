@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 
 #include "../cs457_crypto.h"
 
@@ -52,23 +53,23 @@ void closeSockets(int fd1, int fd2)
  */
 int main(int argc, char *argv[])
 {
-	int sockfd;						  /* listen file descriptor */
-	int sockcl;						  /* comm file descriptor   */
-	int port;						  /* server port		  */
-	int err;						  /* errors		  */
-	int opt;						  /* cmd options		  */
-	int optval;						  /* socket options	  */
-	int plain_len;					  /* plaintext size	  */
-	int cipher_len;					  /* ciphertext size	  */
-	size_t rxb;						  /* received bytes	  */
-	size_t txb;						  /* transmitted bytes	  */
-	struct sockaddr_in srv_addr;	  /* server socket address  */
-	int addrlen = sizeof(srv_addr);   /* size of srv_addr	*/
-	unsigned char *aes_key;			  /* AES key		  */
-	unsigned char plaintext[BUFLEN];  /* plaintext buffer	  */
-	unsigned char ciphertext[BUFLEN]; /* plaintext buffer	  */
-	RSA *s_prv_key;					  /* server private key	  */
-	RSA *c_pub_key;					  /* client public key	  */
+	int sockfd;								/* listen file descriptor */
+	int sockcl;								/* comm file descriptor   */
+	int port;								/* server port		  */
+	int err;								/* errors		  */
+	int opt;								/* cmd options		  */
+	int optval;								/* socket options	  */
+	int plain_len;							/* plaintext size	  */
+	int cipher_len;							/* ciphertext size	  */
+	size_t rxb;								/* received bytes	  */
+	size_t txb;								/* transmitted bytes	  */
+	struct sockaddr_in srv_addr;			/* server socket address  */
+	int addrlen = sizeof(srv_addr);			/* size of srv_addr	*/
+	unsigned char *aes_key;					/* AES key		  */
+	unsigned char plaintext[BUFLEN] = {0};  /* plaintext buffer	  */
+	unsigned char ciphertext[BUFLEN] = {0}; /* plaintext buffer	  */
+	RSA *s_prv_key;							/* server private key	  */
+	RSA *c_pub_key;							/* client public key	  */
 
 	/* initialize */
 	sockfd = -1;
@@ -132,6 +133,9 @@ int main(int argc, char *argv[])
 	}
 
 	/* load keys */
+	aes_key = aes_read_key();
+	s_prv_key = rsa_read_key(S_PRV_KF, 0);
+	c_pub_key = rsa_read_key(C_PUB_KF, 1);
 
 	/* accept a new client connection */
 	if ((sockcl = accept(sockfd, (struct sockaddr *)&srv_addr, (socklen_t *)&addrlen)) < 0)
@@ -141,16 +145,20 @@ int main(int argc, char *argv[])
 	}
 
 	/* wait for a key exchange init */
-
-	/* send the AES key */
-
-	/* receive the encrypted message */
-	if (read(sockcl, plaintext, BUFLEN) < 0)
+	if (read(sockcl, ciphertext, 256) < 0)
 	{
 		perror("read");
 		exit(EXIT_FAILURE);
 	}
-	printf("Recieved: \"%s\"\n", plaintext);
+
+	cipher_len = BUFLEN;
+	plain_len = rsa_pub_priv_decrypt(ciphertext, 256, c_pub_key, s_prv_key, plaintext, RSA_NO_PADDING, RSA_PKCS1_PADDING);
+	printf("Plaintext form: %d\n", plain_len);
+	printf("%s", plaintext);
+
+	/* send the AES key */
+
+	/* receive the encrypted message */
 
 	/* Decrypt the message and print it */
 	if (send(sockcl, plaintext, BUFLEN, 0) < 0)
@@ -159,8 +167,10 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	printf("Sent: \"%s\"\n", plaintext);
+
 	/* cleanup */
 	closeSockets(sockfd, sockcl);
+	memset(aes_key, 0, strlen((const char *)aes_key));
 
 	return 0;
 }

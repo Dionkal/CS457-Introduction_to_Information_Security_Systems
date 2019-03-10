@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS =  -Wall -pedantic -std=c99 -g
+CFLAGS =  -Wall -pedantic -std=gnu99 -g
 LIBSSL = -lssl -lcrypto
 
 TARGETS = server client demo
@@ -10,7 +10,7 @@ server: Server/server.c cs457_crypto.c
 	$(CC) $(CFLAGS) $(LIBSSL) $^ -o Server/server
 
 client: Client/client.c cs457_crypto.c
-	$(CC) $(CFLAGS) $(LIBSSL) $^ -o Client/client 
+	$(CC) $(CFLAGS) $(LIBSSL) $^ -o Client/client
 
 demo: crypto_demo.c cs457_crypto.o
 	$(CC) $(CFLAGS) $(LIBSSL) $^ -o $@
