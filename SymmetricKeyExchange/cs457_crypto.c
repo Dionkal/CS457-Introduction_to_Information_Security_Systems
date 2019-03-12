@@ -381,8 +381,11 @@ int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 	if (cipher_lenght != RSA_size(pub_k))
 	{
 		if (cipher_lenght < 0)
+		{
 			printf("Public encryption length: %d.\t", cipher_lenght);
-		ERRX(-10, "Error after RSA_public_encrypt: Bad cipher size");
+			char *str = ERR_error_string(ERR_get_error(), NULL);
+			MERROR(str);
+		}
 	}
 #ifdef DEBUG
 	printf("Public encryption: %d\n", cipher_lenght);
