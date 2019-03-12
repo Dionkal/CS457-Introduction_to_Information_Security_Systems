@@ -389,6 +389,10 @@ int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 	print_hex(ciphertext, length);
 #endif
 	length = rsa_pub_decrypt(ciphertext, length, pub_k, plaintext, RSA_PKCS1_PADDING);
+	if (length < 0)
+	{
+		ERR_get_error();
+	}
 
 #ifdef DEBUG
 	printf("Public decryption: %d\n", length);

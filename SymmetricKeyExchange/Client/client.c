@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
 	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext);
 
 	txb = send(cfd, ciphertext, cipher_len, 0);
-	if (txb < 0)
+	if (txb < 0 || txb != cipher_len)
 	{
 		perror("send");
 		exit(EXIT_FAILURE);
