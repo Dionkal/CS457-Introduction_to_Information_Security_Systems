@@ -156,11 +156,19 @@ int main(int argc, char *argv[])
 	print_hex(ciphertext, rxb);
 	cipher_len = rxb;
 	plain_len = rsa_pub_priv_decrypt(ciphertext, cipher_len, c_pub_key, s_prv_key, plaintext);
-	printf("Plaintext form: %d\n", plain_len);
-	printf("%s", plaintext);
 
 	/* send the AES key */
+	// TODO: check if client sent the correct passphrase before
+	// replying with the AES key
+	strncpy(plaintext, aes_key, strlen((char *)aes_key));
+	cipher_len = rsa_pub_priv_encrypt(plaintext, strlen((char *)plaintext), c_pub_key, s_prv_key, ciphertext);
 
+	txb = send(sockcl, ciphertext, cipher_len, 0);
+	if (txb < 0 || txb != cipher_len)
+	{
+		perror("Send AES key");
+		exit(EXIT_FAILURE);
+	}
 	/* receive the encrypted message */
 
 	/* Decrypt the message and print it */

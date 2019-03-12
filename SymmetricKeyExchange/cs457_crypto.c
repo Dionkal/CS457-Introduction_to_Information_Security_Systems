@@ -39,6 +39,13 @@
 /*Uncomment for verbose output*/
 #define DEBUG
 
+#define MERROR(str)          \
+	do                       \
+	{                        \
+		printf("%s\n", str); \
+		exit(EXIT_FAILURE);  \
+	} while (0)
+
 /* --------------------------- conversion helpers --------------------------- */
 
 /*
@@ -356,16 +363,27 @@ int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext)
 {
 	int cipher_lenght = 0;
+	if (plaintext_len > RSA_size(priv_k) - 11)
+		ERRX(-10, "Error at rsa_pub_priv_encrypt: plaintext length exceeds allowed value");
 
-	cipher_lenght = rsa_prv_encrypt(plaintext, strlen((const char *)plaintext), priv_k, ciphertext, RSA_PKCS1_PADDING);
+	cipher_lenght = RSA_private_encrypt(plaintext_len, plaintext, ciphertext, priv_k, RSA_PKCS1_PADDING);
+
+	if (cipher_lenght != RSA_size(pub_k))
+		ERRX(-10, "Error after RSA_private_encrypt: Bad cipher size");
 
 #ifdef DEBUG
 	printf("Private encryption: %d\n", cipher_lenght);
 	print_hex(ciphertext, cipher_lenght);
 #endif
 
-	cipher_lenght = rsa_pub_encrypt(ciphertext, cipher_lenght, pub_k, ciphertext, RSA_NO_PADDING);
+	cipher_lenght = RSA_public_encrypt(cipher_lenght, ciphertext, ciphertext, pub_k, RSA_NO_PADDING);
 
+	if (cipher_lenght != RSA_size(pub_k))
+	{
+		if (cipher_lenght < 0)
+			printf("Public encryption length: %d.\t", cipher_lenght);
+		ERRX(-10, "Error after RSA_public_encrypt: Bad cipher size");
+	}
 #ifdef DEBUG
 	printf("Public encryption: %d\n", cipher_lenght);
 	print_hex(ciphertext, cipher_lenght);
@@ -382,17 +400,21 @@ int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 {
 	int length = 0;
 
-	length = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, ciphertext, RSA_NO_PADDING);
+	// length = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, ciphertext, RSA_NO_PADDING);
+	length = RSA_private_decrypt(ciphertext_len, ciphertext, ciphertext, priv_k, RSA_NO_PADDING);
+
+	if (length != RSA_size(priv_k))
+		ERRX(-11, "Error at RSA_private_decrypt: decrypted lenght is incorrect");
 
 #ifdef DEBUG
 	printf("Private decryption: %d\n", length);
 	print_hex(ciphertext, length);
 #endif
-	length = rsa_pub_decrypt(ciphertext, length, pub_k, plaintext, RSA_PKCS1_PADDING);
+
+	length = RSA_public_decrypt(length, ciphertext, plaintext, pub_k, RSA_PKCS1_PADDING);
+
 	if (length < 0)
-	{
-		ERR_get_error();
-	}
+		ERRX(-11, "Error RSA_public_decrypt: Decryption failed");
 
 #ifdef DEBUG
 	printf("Public decryption: %d\n", length);

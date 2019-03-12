@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
    * encrypt the init message
    * and send it to the server
    */
+	strncpy(plaintext, msg, strlen((char *)msg));
 	plain_len = strlen((const char *)plaintext);
 	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext);
 
