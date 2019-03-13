@@ -368,12 +368,14 @@ int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
 		MERROR(str);
 	}
 
-	free(ciphertext);
-	// ciphertext = (unsigned char *)strncpy((char *)ciphertext, (char *)intermediate_buf, result);
+	ciphertext = (unsigned char *)memcpy((char *)ciphertext, (char *)intermediate_buf, result);
+
+#ifdef DEBUG
 	printf("--------------------------------------------Intermediate buffer--------------------------------------------\n");
 	print_hex(intermediate_buf, result);
 	printf("--------------------------------------------Ciphertext buffer--------------------------------------------\n");
 	print_hex(ciphertext, result);
+#endif
 	memset(intermediate_buf, 0, BUFLEN);
 
 	return result;
@@ -403,7 +405,7 @@ int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 		print_hex(intermediate_buf, result_1);
 #endif
 
-		result_2 = RSA_private_decrypt(length_2, ciphertext + length_1, intermediate_buf + result, key, padding_mode);
+		result_2 = RSA_private_decrypt(length_2, ciphertext + length_1, intermediate_buf + result_1, key, padding_mode);
 #ifdef DEBUG
 		printf("First %d bits of private decryption: %d\n", length_1, result_1);
 		print_hex(intermediate_buf, result_1);
@@ -419,7 +421,7 @@ int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 	if (result < 0)
 		ERRX(-9, "Error at rsa_prv_decrypt: Decryption failed");
 
-	strncpy((char *)plaintext, (char *)intermediate_buf, BUFLEN);
+	plaintext = (unsigned char *)memcpy((char *)plaintext, (char *)intermediate_buf, BUFLEN);
 	memset(intermediate_buf, 0, BUFLEN);
 
 	return result;
