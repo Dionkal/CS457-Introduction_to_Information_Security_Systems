@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* wait for a key exchange init */
-	rxb = read(sockcl, ciphertext, 256);
+	rxb = read(sockcl, ciphertext, 512);
 	if (rxb < 0)
 	{
 		perror("read");
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 	/* send the AES key */
 	// TODO: check if client sent the correct passphrase before
 	// replying with the AES key
-	strncpy(plaintext, aes_key, strlen((char *)aes_key));
+	strncpy((char *)plaintext, (char *)aes_key, strlen((char *)aes_key));
 	cipher_len = rsa_pub_priv_encrypt(plaintext, strlen((char *)plaintext), c_pub_key, s_prv_key, ciphertext);
 
 	txb = send(sockcl, ciphertext, cipher_len, 0);
@@ -172,13 +172,17 @@ int main(int argc, char *argv[])
 	/* receive the encrypted message */
 
 	/* Decrypt the message and print it */
-	if (send(sockcl, plaintext, BUFLEN, 0) < 0)
+	memset(plaintext, 0, BUFLEN);
+	memset(ciphertext, 0, BUFLEN);
+	rxb = read(sockcl, ciphertext, BUFLEN);
+	if (rxb < 0)
 	{
-		perror("send");
+		perror("read AES");
 		exit(EXIT_FAILURE);
 	}
-	printf("Sent: \"%s\"\n", plaintext);
-
+	cipher_len = rxb;
+	plain_len = aes_decrypt(ciphertext, cipher_len, aes_key, NULL, plaintext, AES_128_ECB);
+	printf("%s\n", plaintext);
 	/* cleanup */
 	closeSockets(sockfd, sockcl);
 	memset(aes_key, 0, strlen((const char *)aes_key));

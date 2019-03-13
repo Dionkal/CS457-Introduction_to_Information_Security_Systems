@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
    * encrypt the init message
    * and send it to the server
    */
-	strncpy(plaintext, msg, strlen((char *)msg));
+	strncpy((char *)plaintext, (char *)msg, strlen((char *)msg));
 	plain_len = strlen((const char *)plaintext);
 	cipher_len = rsa_pub_priv_encrypt(plaintext, plain_len, s_pub_key, c_prv_key, ciphertext);
 
@@ -166,23 +166,45 @@ int main(int argc, char *argv[])
 	}
 	printf("Sent %d bytes in hex:\n", (int)txb);
 	print_hex(ciphertext, txb);
+	memset(ciphertext, 0, txb);
+	memset(plaintext, 0, plain_len);
 	/*
    * receive the key from the server,
    * decrypt it and register it
    */
-	if (read(cfd, plaintext, BUFLEN) < 0)
+	rxb = read(cfd, ciphertext, BUFLEN);
+	rxb = cipher_len;
+	if (rxb < 0)
 	{
 		perror("read");
 		exit(EXIT_FAILURE);
 	}
-	printf("Recieved: \"%s\"\n", plaintext);
+	plain_len = rsa_pub_priv_decrypt(ciphertext, cipher_len, s_pub_key, c_prv_key, plaintext);
+
+	printf("Recieved: %d\n\"%s\"\n", plain_len, plaintext);
+	aes_key = malloc(sizeof(unsigned char) * 129); // reserve space for key
+	aes_key = (unsigned char *)strndup((const char *)plaintext, plain_len);
+
+	memset(plaintext, 0, plain_len);
+	memset(ciphertext, 0, cipher_len);
 
 	/* encrypt the message with the AES key */
+
+	strcpy((char *)plaintext, (char *)"This message was sent with AES encryption!");
+	cipher_len = aes_encrypt(plaintext,
+							 strlen((char *)plaintext), aes_key, NULL, ciphertext, AES_128_ECB);
+	txb = send(cfd, ciphertext, cipher_len, 0);
+	if (txb < 0)
+	{
+		perror("send AES");
+		exit(EXIT_FAILURE);
+	}
 
 	/* send the encrypted message */
 
 	/* cleanup */
 	closeSocket(cfd);
+	free(aes_key);
 	return 0;
 }
 
