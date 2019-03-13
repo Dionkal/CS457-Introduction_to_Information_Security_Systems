@@ -322,7 +322,60 @@ int aes_decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *ke
 int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
 					RSA *key, unsigned char *ciphertext, int padding_mode)
 {
-	int result = RSA_public_encrypt(plaintext_len, plaintext, ciphertext, key, padding_mode);
+	unsigned char intermediate_buf[BUFLEN] = {0};
+	int length_1 = plaintext_len;
+	int length_2 = 0;
+	int result_1 = 0;
+	int result_2 = 0;
+	int result = 0;
+
+	if (length_1 >= RSA_size(key))
+	{
+		length_1 = plaintext_len / 2;
+		length_2 = plaintext_len - length_1;
+
+		result_1 = RSA_public_encrypt(length_1, plaintext, intermediate_buf, key, padding_mode);
+		if (result_1 != RSA_size(key))
+			ERRX(-8, "Error after first  rsa_pub_encrypt: Bad cipher size");
+
+#ifdef DEBUG
+		printf("First %d bits of public encryption: %d\n", length_1, result_1);
+		print_hex(intermediate_buf, result_1);
+#endif
+
+		result_2 = RSA_public_encrypt(length_2, plaintext + length_1, intermediate_buf + result_1, key, padding_mode);
+		if (result_2 != RSA_size(key))
+			ERRX(-8, "Error after second rsa_pub_encrypt: Bad cipher size");
+
+#ifdef DEBUG
+		printf("First plaintext %d bits of public encryption: %d\n", length_1, result_1);
+		print_hex(intermediate_buf, result_1);
+		printf("Second plaintext %d bits of public encryption: %d\n", length_2, result_2);
+		print_hex(intermediate_buf + result_1, result_2);
+#endif
+		result = result_1 + result_2;
+	}
+	else
+	{
+		result = RSA_public_encrypt(plaintext_len, plaintext, intermediate_buf, key, padding_mode);
+		if (result != RSA_size(key))
+			ERRX(-8, "Error after rsa_pub_encrypt: Bad cipher size");
+	}
+
+	if (result < 0)
+	{
+		char *str = ERR_error_string(ERR_get_error(), NULL);
+		MERROR(str);
+	}
+
+	free(ciphertext);
+	// ciphertext = (unsigned char *)strncpy((char *)ciphertext, (char *)intermediate_buf, result);
+	printf("--------------------------------------------Intermediate buffer--------------------------------------------\n");
+	print_hex(intermediate_buf, result);
+	printf("--------------------------------------------Ciphertext buffer--------------------------------------------\n");
+	print_hex(ciphertext, result);
+	memset(intermediate_buf, 0, BUFLEN);
+
 	return result;
 }
 
@@ -332,7 +385,43 @@ int rsa_pub_encrypt(unsigned char *plaintext, int plaintext_len,
 int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 					RSA *key, unsigned char *plaintext, int padding_mode)
 {
-	int result = RSA_private_decrypt(ciphertext_len, ciphertext, plaintext, key, padding_mode);
+	unsigned char intermediate_buf[BUFLEN];
+	int length_1 = ciphertext_len;
+	int length_2 = 0;
+	int result_1 = 0;
+	int result_2 = 0;
+	int result = 0;
+
+	if (ciphertext_len >= 256)
+	{
+		length_1 = ciphertext_len / 2;
+		length_2 = ciphertext_len - length_1;
+
+		result_1 = RSA_private_decrypt(length_1, ciphertext, intermediate_buf, key, padding_mode);
+#ifdef DEBUG
+		printf("First %d bits of private decryption: %d\n", length_1, result_1);
+		print_hex(intermediate_buf, result_1);
+#endif
+
+		result_2 = RSA_private_decrypt(length_2, ciphertext + length_1, intermediate_buf + result, key, padding_mode);
+#ifdef DEBUG
+		printf("First %d bits of private decryption: %d\n", length_1, result_1);
+		print_hex(intermediate_buf, result_1);
+		printf("Second %d bits of private decryption: %d\n", length_2, result_2);
+		print_hex(intermediate_buf + result_1, result_2);
+#endif
+		result = result_1 + result_2;
+	}
+	else
+	{
+		result = RSA_private_decrypt(ciphertext_len, ciphertext, intermediate_buf, key, padding_mode);
+	}
+	if (result < 0)
+		ERRX(-9, "Error at rsa_prv_decrypt: Decryption failed");
+
+	strncpy((char *)plaintext, (char *)intermediate_buf, BUFLEN);
+	memset(intermediate_buf, 0, BUFLEN);
+
 	return result;
 }
 
@@ -342,7 +431,18 @@ int rsa_prv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 int rsa_prv_encrypt(unsigned char *plaintext, int plaintext_len,
 					RSA *key, unsigned char *ciphertext, int padding_mode)
 {
+	if (plaintext_len > RSA_size(key) - 11)
+		ERRX(-10, "Error at rsa_pub_priv_encrypt: plaintext length exceeds allowed value");
+
 	int result = RSA_private_encrypt(plaintext_len, plaintext, ciphertext, key, padding_mode);
+
+	if (result < 0)
+	{
+		char *str = ERR_error_string(ERR_get_error(), NULL);
+		MERROR(str);
+	}
+	if (result != RSA_size(key))
+		ERRX(-10, "Error after rsa_pub_priv_encrypt: Bad cipher size");
 	return result;
 }
 
@@ -352,7 +452,13 @@ int rsa_prv_encrypt(unsigned char *plaintext, int plaintext_len,
 int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
 					RSA *key, unsigned char *plaintext, int padding_mode)
 {
+	if (ciphertext_len != RSA_size(key))
+		ERRX(-11, "Error rsa_pub_decrypt: Invalid cipher lenght");
 	int result = RSA_public_decrypt(ciphertext_len, ciphertext, plaintext, key, padding_mode);
+
+	if (result < 0)
+		ERRX(-11, "Error rsa_pub_decrypt: Decryption failed");
+
 	return result;
 }
 
@@ -362,37 +468,23 @@ int rsa_pub_decrypt(unsigned char *ciphertext, int ciphertext_len,
 int rsa_pub_priv_encrypt(unsigned char *plaintext, int plaintext_len,
 						 RSA *pub_k, RSA *priv_k, unsigned char *ciphertext)
 {
-	int cipher_lenght = 0;
-	if (plaintext_len > RSA_size(priv_k) - 11)
-		ERRX(-10, "Error at rsa_pub_priv_encrypt: plaintext length exceeds allowed value");
+	int cipher_length = 0;
 
-	cipher_lenght = RSA_private_encrypt(plaintext_len, plaintext, ciphertext, priv_k, RSA_PKCS1_PADDING);
-
-	if (cipher_lenght != RSA_size(pub_k))
-		ERRX(-10, "Error after RSA_private_encrypt: Bad cipher size");
+	cipher_length = rsa_prv_encrypt(plaintext, plaintext_len, priv_k, ciphertext, RSA_PKCS1_PADDING);
 
 #ifdef DEBUG
-	printf("Private encryption: %d\n", cipher_lenght);
-	print_hex(ciphertext, cipher_lenght);
+	printf("Private encryption: %d\n", cipher_length);
+	print_hex(ciphertext, cipher_length);
 #endif
 
-	cipher_lenght = RSA_public_encrypt(cipher_lenght, ciphertext, ciphertext, pub_k, RSA_NO_PADDING);
+	cipher_length = rsa_pub_encrypt(ciphertext, cipher_length, pub_k, ciphertext, RSA_PKCS1_PADDING);
 
-	if (cipher_lenght != RSA_size(pub_k))
-	{
-		if (cipher_lenght < 0)
-		{
-			printf("Public encryption length: %d.\t", cipher_lenght);
-			char *str = ERR_error_string(ERR_get_error(), NULL);
-			MERROR(str);
-		}
-	}
 #ifdef DEBUG
-	printf("Public encryption: %d\n", cipher_lenght);
-	print_hex(ciphertext, cipher_lenght);
+	printf("Public encryption: %d\n", cipher_length);
+	print_hex(ciphertext, cipher_length);
 #endif
 
-	return cipher_lenght;
+	return cipher_length;
 }
 
 /*
@@ -403,8 +495,8 @@ int rsa_pub_priv_decrypt(unsigned char *ciphertext, int ciphertext_len,
 {
 	int length = 0;
 
-	// length = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, ciphertext, RSA_NO_PADDING);
-	length = RSA_private_decrypt(ciphertext_len, ciphertext, ciphertext, priv_k, RSA_NO_PADDING);
+	length = rsa_prv_decrypt(ciphertext, ciphertext_len, priv_k, ciphertext, RSA_PKCS1_PADDING);
+	// length = RSA_private_decrypt(ciphertext_len, ciphertext, ciphertext, priv_k, RSA_PKCS1_PADDING);
 
 	if (length != RSA_size(priv_k))
 		ERRX(-11, "Error at RSA_private_decrypt: decrypted lenght is incorrect");

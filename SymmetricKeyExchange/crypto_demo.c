@@ -29,16 +29,16 @@ int main(int argc, char **argv)
 	private_key2 = rsa_read_key(S_PRV_KF, 0);
 	public_key2 = rsa_read_key(S_PUB_KF, 1);
 
-	unsigned char rsa_encryption[RSA_size(private_key1)];
+	unsigned char rsa_encryption[BUFLEN];
 	/*----------------------------------------------Encrypt----------------------------------------------*/
 	printf("----------------------------------------------Encrypt----------------------------------------------\n");
 	decrypted_text_len = rsa_pub_priv_encrypt(plaintext, plain_text_len, public_key2, private_key1, rsa_encryption);
 	printf("encrypted text lenght: %d\n", decrypted_text_len);
 	/*----------------------------------------------Decrypt----------------------------------------------*/
-	printf("----------------------------------------------Decrypt----------------------------------------------\n");
-	memset(plaintext, 0, BUFLEN);
-	decrypted_text_len = rsa_pub_priv_decrypt(rsa_encryption, decrypted_text_len, public_key1, private_key2, plaintext);
-	printf("plaintext: \n\"%s\"\n", plaintext);
+	// printf("----------------------------------------------Decrypt----------------------------------------------\n");
+	// memset(plaintext, 0, BUFLEN);
+	// decrypted_text_len = rsa_pub_priv_decrypt(rsa_encryption, decrypted_text_len, public_key1, private_key2, plaintext);
+	// printf("plaintext: \n\"%s\"\n", plaintext);
 	return 0;
 }
 
