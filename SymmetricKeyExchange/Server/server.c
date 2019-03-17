@@ -19,7 +19,7 @@
  * this value or by using -p <port>
  */
 #define DEFAULT_PORT 3613
-
+#define PASS_PHRASE "hello friend"
 /*
  * prints the usage message
  */
@@ -45,6 +45,38 @@ void closeSockets(int fd1, int fd2)
 	sleep(10);
 	close(fd1);
 	close(fd2);
+}
+
+int ServerGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int aes_mode)
+{
+	/* Decrypt the message and print it */
+	memset(plaintext, 0, BUFLEN);
+	memset(ciphertext, 0, BUFLEN);
+	int bytes_read = 0;
+	bytes_read = read(socket, ciphertext, BUFLEN);
+	if (bytes_read < 0)
+	{
+		perror("read AES");
+		exit(EXIT_FAILURE);
+	}
+	int cipher_len = bytes_read;
+	int plaintext_length = aes_decrypt(ciphertext, cipher_len, aes_key, NULL, plaintext, aes_mode);
+	printf("Fs0ciety: %s\n", plaintext);
+	return plaintext_length;
+}
+
+int ServerSendAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int AESMode)
+{
+	int cipher_len = aes_encrypt(plaintext,
+								 strlen((char *)plaintext), aes_key, NULL, ciphertext, AESMode);
+	int bytes_transmited = send(socket, ciphertext, cipher_len, 0);
+	if (bytes_transmited < 0 || bytes_transmited != cipher_len)
+	{
+		perror("send AES");
+		exit(EXIT_FAILURE);
+	}
+	printf("Whiter0se(you): %s\n", plaintext);
+	return bytes_transmited;
 }
 
 /*
@@ -100,11 +132,6 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-   * this will save them from:
-   * "ERROR on binding: Address already in use"
-   */
-
-	/*
    * bind and listen the socket
    * for new client connections
    */
@@ -152,8 +179,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+#ifdef DEBUG
 	printf("Recieved %d bytes in hex:\n", (int)rxb);
 	print_hex(ciphertext, rxb);
+#endif
+
 	cipher_len = rxb;
 	plain_len = rsa_pub_priv_decrypt(ciphertext, cipher_len, c_pub_key, s_prv_key, plaintext);
 
@@ -170,19 +200,12 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	/* receive the encrypted message */
+	ServerGetAESMessage(plaintext, ciphertext, aes_key, sockcl, AES_128_ECB);
 
-	/* Decrypt the message and print it */
-	memset(plaintext, 0, BUFLEN);
-	memset(ciphertext, 0, BUFLEN);
-	rxb = read(sockcl, ciphertext, BUFLEN);
-	if (rxb < 0)
-	{
-		perror("read AES");
-		exit(EXIT_FAILURE);
-	}
-	cipher_len = rxb;
-	plain_len = aes_decrypt(ciphertext, cipher_len, aes_key, NULL, plaintext, AES_128_ECB);
-	printf("%s\n", plaintext);
+	strcpy((char *)plaintext, (char *)"Every hacker has her fixation. You hack people, I hack time.");
+
+	ServerSendAESMessage(plaintext, ciphertext, aes_key, sockcl, AES_128_ECB);
+
 	/* cleanup */
 	closeSockets(sockfd, sockcl);
 	memset(aes_key, 0, strlen((const char *)aes_key));

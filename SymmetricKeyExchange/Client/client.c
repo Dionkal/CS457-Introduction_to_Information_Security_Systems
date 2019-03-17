@@ -65,6 +65,38 @@ void closeSocket(int fd)
 	close(fd);
 }
 
+int ClientGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int aes_mode)
+{
+	/* Decrypt the message and print it */
+	memset(plaintext, 0, BUFLEN);
+	memset(ciphertext, 0, BUFLEN);
+	int bytes_read = 0;
+	bytes_read = read(socket, ciphertext, BUFLEN);
+	if (bytes_read < 0)
+	{
+		perror("read AES");
+		exit(EXIT_FAILURE);
+	}
+	int cipher_len = bytes_read;
+	int plaintext_length = aes_decrypt(ciphertext, cipher_len, aes_key, NULL, plaintext, aes_mode);
+	printf("Whiter0se: %s\n", plaintext);
+	return plaintext_length;
+}
+
+int clientSendAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int AESMode)
+{
+	int cipher_len = aes_encrypt(plaintext,
+								 strlen((char *)plaintext), aes_key, NULL, ciphertext, AESMode);
+	int bytes_transmited = send(socket, ciphertext, cipher_len, 0);
+	if (bytes_transmited < 0 || bytes_transmited != cipher_len)
+	{
+		perror("send AES");
+		exit(EXIT_FAILURE);
+	}
+	printf("Fs0ciety(you): %s\n", plaintext);
+	return bytes_transmited;
+}
+
 /*
  * simple chat client with RSA-based AES
  * key-exchange for encrypted communication
@@ -164,8 +196,12 @@ int main(int argc, char *argv[])
 		perror("send");
 		exit(EXIT_FAILURE);
 	}
+
+#ifdef DEBUG
 	printf("Sent %d bytes in hex:\n", (int)txb);
 	print_hex(ciphertext, txb);
+#endif
+
 	memset(ciphertext, 0, txb);
 	memset(plaintext, 0, plain_len);
 	/*
@@ -181,7 +217,10 @@ int main(int argc, char *argv[])
 	}
 	plain_len = rsa_pub_priv_decrypt(ciphertext, cipher_len, s_pub_key, c_prv_key, plaintext);
 
+#ifdef DEBUG
 	printf("Recieved: %d\n\"%s\"\n", plain_len, plaintext);
+#endif
+
 	aes_key = malloc(sizeof(unsigned char) * 129); // reserve space for key
 	aes_key = (unsigned char *)strndup((const char *)plaintext, plain_len);
 
@@ -189,21 +228,15 @@ int main(int argc, char *argv[])
 	memset(ciphertext, 0, cipher_len);
 
 	/* encrypt the message with the AES key */
-
-	strcpy((char *)plaintext, (char *)"This message was sent with AES encryption!");
-	cipher_len = aes_encrypt(plaintext,
-							 strlen((char *)plaintext), aes_key, NULL, ciphertext, AES_128_ECB);
-	txb = send(cfd, ciphertext, cipher_len, 0);
-	if (txb < 0)
-	{
-		perror("send AES");
-		exit(EXIT_FAILURE);
-	}
-
 	/* send the encrypted message */
+	strcpy((char *)plaintext, (char *)"A bug is never just a mistake. It represents something bigger. An error of thinking. That makes you who you are.");
+	clientSendAESMessage(plaintext, ciphertext, aes_key, cfd, AES_128_ECB);
+	ClientGetAESMessage(plaintext, ciphertext, aes_key, cfd, AES_128_ECB);
 
 	/* cleanup */
 	closeSocket(cfd);
+	/*clean up memory before freeing the pointer*/
+	aes_key = memset(aes_key, 0, strlen((char *)aes_key));
 	free(aes_key);
 	return 0;
 }

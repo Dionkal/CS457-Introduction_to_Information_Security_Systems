@@ -37,7 +37,7 @@
 #define AES_BS 16
 
 /*Uncomment for verbose output*/
-#define DEBUG
+/*#define DEBUG*/
 
 #define MERROR(str)          \
 	do                       \
