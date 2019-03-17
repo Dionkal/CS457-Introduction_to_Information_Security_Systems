@@ -65,7 +65,7 @@ void closeSocket(int fd)
 	close(fd);
 }
 
-int ClientGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int aes_mode)
+int ClientGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int aes_mode, unsigned char *vector)
 {
 	/* Decrypt the message and print it */
 	memset(plaintext, 0, BUFLEN);
@@ -78,15 +78,15 @@ int ClientGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, uns
 		exit(EXIT_FAILURE);
 	}
 	int cipher_len = bytes_read;
-	int plaintext_length = aes_decrypt(ciphertext, cipher_len, aes_key, NULL, plaintext, aes_mode);
+	int plaintext_length = aes_decrypt(ciphertext, cipher_len, aes_key, vector, plaintext, aes_mode);
 	printf("Whiter0se: %s\n", plaintext);
 	return plaintext_length;
 }
 
-int clientSendAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int AESMode)
+int clientSendAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int AESMode, unsigned char *vector)
 {
 	int cipher_len = aes_encrypt(plaintext,
-								 strlen((char *)plaintext), aes_key, NULL, ciphertext, AESMode);
+								 strlen((char *)plaintext), aes_key, vector, ciphertext, AESMode);
 	int bytes_transmited = send(socket, ciphertext, cipher_len, 0);
 	if (bytes_transmited < 0 || bytes_transmited != cipher_len)
 	{
@@ -117,8 +117,9 @@ int main(int argc, char *argv[])
 	unsigned char *aes_key;					/* AES key		 */
 	unsigned char plaintext[BUFLEN] = {0};  /* plaintext buffer	 */
 	unsigned char ciphertext[BUFLEN] = {0}; /* plaintext buffer	 */
-	RSA *c_prv_key;							/* client private key	 */
-	RSA *s_pub_key;							/* server public key	 */
+	unsigned char *IV = (unsigned char *)"143278389942760";
+	RSA *c_prv_key; /* client private key	 */
+	RSA *s_pub_key; /* server public key	 */
 
 	/* initialize */
 	cfd = -1;
@@ -230,8 +231,8 @@ int main(int argc, char *argv[])
 	/* encrypt the message with the AES key */
 	/* send the encrypted message */
 	strcpy((char *)plaintext, (char *)"A bug is never just a mistake. It represents something bigger. An error of thinking. That makes you who you are.");
-	clientSendAESMessage(plaintext, ciphertext, aes_key, cfd, AES_128_ECB);
-	ClientGetAESMessage(plaintext, ciphertext, aes_key, cfd, AES_128_ECB);
+	clientSendAESMessage(plaintext, ciphertext, aes_key, cfd, AES_128_CBC, IV);
+	ClientGetAESMessage(plaintext, ciphertext, aes_key, cfd, AES_128_CBC, IV);
 
 	/* cleanup */
 	closeSocket(cfd);

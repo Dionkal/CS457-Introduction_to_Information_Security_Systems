@@ -19,7 +19,7 @@
  * this value or by using -p <port>
  */
 #define DEFAULT_PORT 3613
-#define PASS_PHRASE "hello friend"
+#define PASS_PHRASE "hello_friend"
 /*
  * prints the usage message
  */
@@ -47,7 +47,7 @@ void closeSockets(int fd1, int fd2)
 	close(fd2);
 }
 
-int ServerGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int aes_mode)
+int ServerGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int aes_mode, unsigned char *vector)
 {
 	/* Decrypt the message and print it */
 	memset(plaintext, 0, BUFLEN);
@@ -60,15 +60,15 @@ int ServerGetAESMessage(unsigned char *plaintext, unsigned char *ciphertext, uns
 		exit(EXIT_FAILURE);
 	}
 	int cipher_len = bytes_read;
-	int plaintext_length = aes_decrypt(ciphertext, cipher_len, aes_key, NULL, plaintext, aes_mode);
+	int plaintext_length = aes_decrypt(ciphertext, cipher_len, aes_key, vector, plaintext, aes_mode);
 	printf("Fs0ciety: %s\n", plaintext);
 	return plaintext_length;
 }
 
-int ServerSendAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int AESMode)
+int ServerSendAESMessage(unsigned char *plaintext, unsigned char *ciphertext, unsigned char *aes_key, int socket, int AESMode, unsigned char *vector)
 {
 	int cipher_len = aes_encrypt(plaintext,
-								 strlen((char *)plaintext), aes_key, NULL, ciphertext, AESMode);
+								 strlen((char *)plaintext), aes_key, vector, ciphertext, AESMode);
 	int bytes_transmited = send(socket, ciphertext, cipher_len, 0);
 	if (bytes_transmited < 0 || bytes_transmited != cipher_len)
 	{
@@ -100,8 +100,9 @@ int main(int argc, char *argv[])
 	unsigned char *aes_key;					/* AES key		  */
 	unsigned char plaintext[BUFLEN] = {0};  /* plaintext buffer	  */
 	unsigned char ciphertext[BUFLEN] = {0}; /* plaintext buffer	  */
-	RSA *s_prv_key;							/* server private key	  */
-	RSA *c_pub_key;							/* client public key	  */
+	unsigned char *IV = (unsigned char *)"143278389942760";
+	RSA *s_prv_key; /* server private key	  */
+	RSA *c_pub_key; /* client public key	  */
 
 	/* initialize */
 	sockfd = -1;
@@ -190,6 +191,13 @@ int main(int argc, char *argv[])
 	/* send the AES key */
 	// TODO: check if client sent the correct passphrase before
 	// replying with the AES key
+	if (strcmp((const char *)plaintext, PASS_PHRASE) != 0)
+	{
+		printf("Invalid passphrase\n");
+		closeSockets(sockfd, sockcl);
+		return -300;
+	}
+
 	strncpy((char *)plaintext, (char *)aes_key, strlen((char *)aes_key));
 	cipher_len = rsa_pub_priv_encrypt(plaintext, strlen((char *)plaintext), c_pub_key, s_prv_key, ciphertext);
 
@@ -200,11 +208,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	/* receive the encrypted message */
-	ServerGetAESMessage(plaintext, ciphertext, aes_key, sockcl, AES_128_ECB);
+	ServerGetAESMessage(plaintext, ciphertext, aes_key, sockcl, AES_128_CBC, IV);
 
 	strcpy((char *)plaintext, (char *)"Every hacker has her fixation. You hack people, I hack time.");
 
-	ServerSendAESMessage(plaintext, ciphertext, aes_key, sockcl, AES_128_ECB);
+	ServerSendAESMessage(plaintext, ciphertext, aes_key, sockcl, AES_128_CBC, IV);
 
 	/* cleanup */
 	closeSockets(sockfd, sockcl);
