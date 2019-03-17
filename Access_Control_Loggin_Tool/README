@@ -1,0 +1,5 @@
+In this assignment you are going to develop in C, an ​access control logging system​. This system will keep track of all file accesses and modifications. Every
+such operation will generate an entry in a log file, stored for further investigation by a separate high privileged process. For this assignment you will need to
+use LD_PRELOAD which gives the ability to instruct the linker to bind symbols provided by a shared library before other libraries. This way, you are going to override
+the C standard library functions that handle file accesses and modifications (fopen,fwrite) with your own versions in order to extend their functionality. You will
+also test your logging system against a ransomware, so your access control logging needs to be able to detect ransomware behavior.
