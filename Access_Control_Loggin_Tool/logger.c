@@ -3,15 +3,22 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define _LOG_PATH_ "my_logfile.log"
 
 FILE *fopen(const char *pathname, const char *mode)
 {
-	/* Log stuff */
-	printf("Fopen wrapper\n");
-
-	/* Actual call of fopen */
+	/* pointers to original fopen & fwrite */
 	FILE *(*original_fopen)(const char *, const char *);
 	original_fopen = dlsym(RTLD_NEXT, "fopen");
+	size_t (*original_fwrite)(const void *, size_t, size_t, FILE *);
+	original_fwrite = dlsym(RTLD_NEXT, "fwrite");
+
+	/* Log stuff */
+	LogStuff("Fopen wrapper\n");
+
+	/* Actual call of fopen */
 	return (*original_fopen)(pathname, mode);
 }
 
@@ -23,11 +30,29 @@ FILE *fopen(const char *pathname, const char *mode)
 */
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-	/* Log stuff */
-	printf("Fwrite wrapper\n");
-
-	/* Actual call of fwrite */
+	/* pointers to original fopen & fwrite */
+	FILE *(*original_fopen)(const char *, const char *);
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
 	size_t (*original_fwrite)(const void *, size_t, size_t, FILE *);
 	original_fwrite = dlsym(RTLD_NEXT, "fwrite");
+
+	/* Log stuff */
+	LogStuff("Fwrite wrapper\n");
+
+	/* Actual call of fwrite */
 	return (*original_fwrite)(ptr, size, nmemb, stream);
+}
+
+/* Appends the given message to the file specified by _LOG_PATH_ */
+void LogStuff(char *msg)
+{
+	FILE *(*original_fopen)(const char *, const char *);
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
+	size_t (*original_fwrite)(const void *, size_t, size_t, FILE *);
+	original_fwrite = dlsym(RTLD_NEXT, "fwrite");
+
+	/* Log stuff */
+	FILE *logFileptr;
+	logFileptr = (*original_fopen)(_LOG_PATH_, "a");
+	(*original_fwrite)(msg, strlen(msg), sizeof(char), logFileptr);
 }
