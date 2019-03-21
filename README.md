@@ -1,6 +1,5 @@
 ## **CS457 Assignment 1 Server Client Key Exchange**
 
----------------------------
 ### INTRODUCTION
 
 In this assignment you are going to develop, step-by-step, a simple symmetric key
@@ -24,9 +23,9 @@ machines, change the port with your AM, as stated in the exercise description.
 
 If you want to run it in debug mode uncomment the #define DEBUG line in cs457_crypto.c
 for a more verbose output
----------------------------
 
-Sample Execution:
+
+### SAMPLE EXECUTION:
 
 `tty1 $ ./Server/server [-p <port>]`
 
@@ -35,7 +34,7 @@ Sample Execution:
 
 ## **CS457 Assignment 2 AccessControl Logging Tool**
 
----------------------------
+
 ### INTRODUCTION
 
 In this assignment you are going to develop in C, an ​access control logging system​. This system will keep track of all file accesses and modifications. Every
@@ -47,13 +46,13 @@ also test your logging system against a ransomware, so your access control loggi
 
 ### EVENT LOGGING
 
-#### ToDo
+#### TODO
 
 - Add fingerprint field in log file (MD5 Hashing)
 - Make fopen and fwrite log field display failure whenever a function fails for whatever reason
 - Print correct filename and path in log file when calling fwrite
 
-#### **IMPORTANT:** Running
+#### **IMPORTANT:** RUNNING
 
 In order to run demo with the modified shared object you need to type the following command:
 
