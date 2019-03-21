@@ -28,9 +28,9 @@ for a more verbose output
 
 Sample Execution:
 
-tty1 $ ./Server/server [-p <port>]
+`tty1 $ ./Server/server [-p <port>]`
 
-tty2 $ ./Client/client -i 127.0.0.1 -p 3613 -m hello_friend
+`tty2 $ ./Client/client -i 127.0.0.1 -p 3613 -m hello_friend`
 
 
 ## **CS457 Assignment 2 AccessControl Logging Tool**
@@ -56,4 +56,5 @@ also test your logging system against a ransomware, so your access control loggi
 #### **IMPORTANT:** Running
 
 In order to run demo with the modified shared object you need to type the following command:
-	LD_PRELOAD=./logger.so ./demo
+
+	`LD_PRELOAD=./logger.so ./demo`
