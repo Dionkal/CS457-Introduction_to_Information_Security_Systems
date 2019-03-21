@@ -189,7 +189,6 @@ int main(int argc, char *argv[])
 	plain_len = rsa_pub_priv_decrypt(ciphertext, cipher_len, c_pub_key, s_prv_key, plaintext);
 
 	/* send the AES key */
-	// TODO: check if client sent the correct passphrase before
 	// replying with the AES key
 	if (strcmp((const char *)plaintext, PASS_PHRASE) != 0)
 	{

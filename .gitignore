@@ -10,3 +10,7 @@ server
 SymmetricKeyExchange/demo
 demo
 .vscode/launch.json
+
+Access_Control_Loggin_Tool/*.log
+Access_Control_Loggin_Tool/*.dat
+Access_Control_Loggin_Tool/*.so

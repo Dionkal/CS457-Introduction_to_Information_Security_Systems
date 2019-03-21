@@ -6,6 +6,12 @@ the C standard library functions that handle file accesses and modifications (fo
 also test your logging system against a ransomware, so your access control logging needs to be able to detect ransomware behavior.
 
 
-#Running
+# Event Logging
+## ToDo
+- Add fingerprint field in log file (MD5 Hashing)
+- Make fopen and fwrite log field display failure whenever a function fails for whatever reason
+- Print correct filename and path in log file when calling fwrite
+
+## Running
 In order to run demo with the modified shared object you need to type the following command:
 	LD_PRELOAD=./logger.so ./demo
