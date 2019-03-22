@@ -27,9 +27,8 @@ for a more verbose output
 
 ### SAMPLE EXECUTION:
 
-`tty1 $ ./Server/server [-p <port>]`
-
-`tty2 $ ./Client/client -i 127.0.0.1 -p 3613 -m hello_friend`
+	`tty1 $ ./Server/server [-p <port>]`
+	`tty2 $ ./Client/client -i 127.0.0.1 -p 3613 -m hello_friend`
 
 
 ## **CS457 Assignment 2 AccessControl Logging Tool**
@@ -49,11 +48,21 @@ also test your logging system against a ransomware, so your access control loggi
 #### TODO
 
 - Add fingerprint field in log file (MD5 Hashing)
-- Make fopen and fwrite log field display failure whenever a function fails for whatever reason
-- Print correct filename and path in log file when calling fwrite
+- Make fopen and fwrite log field display failure whenever a function fails for whatever reason (Done)
+- Print correct filename and path in log file when calling fwrite (Done)
+- Add file creation log entry when fopen creates file
 
-#### **IMPORTANT:** RUNNING
+#### IMPORTANT:
 
-In order to run demo with the modified shared object you need to type the following command:
+**FILE NAMES:** File paths and names must not exceed the BUFSIZE - 1 bytes in length. If the size causes errors then go to logger.c and change it
+	`/* Buffer size*/`
+	`#define BUFSIZE 256`
 
-	`LD_PRELOAD=./logger.so ./demo`
+
+**Note:** Fopen logs access denied when errno is set to EACCES, whereas fwrites logs access denied whenever it fails.
+{: .note}
+
+
+**RUNNING:** In order to run demo with the modified shared object you need to type the following command:
+
+	`tty1 $ LD_PRELOAD=./logger.so ./demo`
