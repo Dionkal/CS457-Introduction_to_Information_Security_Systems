@@ -3,7 +3,7 @@
 
 int main()
 {
-	FILE *fd = fopen("fsocity00.dat", "w");
+	FILE *fd = fopen("test.dat", "a+");
 
 	if (fd == NULL)
 	{
@@ -16,5 +16,6 @@ int main()
 	{
 		perror("Error in fwrite");
 	}
+	fclose(fd);
 	return 0;
 }

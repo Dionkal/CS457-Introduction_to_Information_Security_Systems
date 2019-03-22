@@ -1,8 +1,7 @@
 CC = gcc
 CSHAREDFLAGS =  -Wall -fPIC -shared -pedantic -std=gnu99 -g
 CFLASG = -Wall -pedantic -std=gnu99 -g
-SUFIX = -ldl
-
+SUFIX = -ldl -lssl -lcrypto
 
 TARGETS = logger demo
 

@@ -22,12 +22,16 @@
  * Each message is seperated by a new line.
  * Each value is seperated by a comma.
  */
-void LogStuff(const char *filename, int action_type, int action_denied);
+static void LogStuff(const char *filename, int action_type, int action_denied);
 
-/* Returns the file name and path of the given FILE structure.
- * Please note that the path of the file must not exceed BUFLEN -1
+/* Returns the file name and path of the given FILE structure or filename
+ * depending of the mode that it's called.
+ * Please note that the path of the file must not exceed BUFSIZE -1
  * bytes in order to avoid memory corruption.
 */
-char *getFilePath(FILE *stream, const char *filename, int mode);
+static char *getFilePath(FILE *stream, const char *filename, int mode);
+
+/* Calculate fingerprint of the given filename using MD5 hash */
+static unsigned char *CalculateFingerprint(const char *filename);
 
 #endif

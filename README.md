@@ -47,7 +47,7 @@ also test your logging system against a ransomware, so your access control loggi
 
 #### TODO
 
-- Add fingerprint field in log file (MD5 Hashing)
+- Add fingerprint field in log file (MD5 Hashing) (Done fwrite fingerprint doesn't update before closing the file)
 - Make fopen and fwrite log field display failure whenever a function fails for whatever reason (Done)
 - Print correct filename and path in log file when calling fwrite (Done)
 - Add file creation log entry when fopen creates file

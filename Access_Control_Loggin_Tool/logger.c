@@ -7,10 +7,14 @@
 #include <unistd.h>
 #include <time.h>
 #include <errno.h>
+#include <openssl/md5.h>
 #include "logger.h"
 
 /* Path to log file */
 #define _LOG_PATH_ "my_logfile.log"
+
+/* Uncomment the next line for more verbose output */
+#define _DEBUG_
 
 /* FILE ACTION TYPE MACROS */
 #define TYPE_CREATE_FILE 0
@@ -32,9 +36,10 @@
  * Each message is seperated by a new line.
  * Each value is seperated by a comma.
  */
-void LogStuff(const char *filename, int action_type, int action_denied)
+static void LogStuff(const char *filename, int action_type, int action_denied)
 {
 	char buffer[BUFSIZE];
+	unsigned char *fingerprint;
 	FILE *(*original_fopen)(const char *, const char *);
 	original_fopen = dlsym(RTLD_NEXT, "fopen");
 	size_t (*original_fwrite)(const void *, size_t, size_t, FILE *);
@@ -53,13 +58,28 @@ void LogStuff(const char *filename, int action_type, int action_denied)
 	char *date2 = (char *)malloc(sizeof(char) * 64);
 	date2 = strncpy(date2, date, strlen(date) - 1);
 
+	/* Fingerprint */
+	fingerprint = CalculateFingerprint(filename);
+
 	/* Write to Log*/
-	sprintf(buffer, "%d,%s,%s,%li,%d,%d\n", uid, filename, date2, t, action_type, action_denied);
+	sprintf(buffer, "%d,%s,%s,%li,%d,%d,", uid, filename, date2, t, action_type, action_denied);
+	(*original_fwrite)(buffer, sizeof(char), strlen(buffer), logFile);
+
+	/* append fingerprint to log entry */
+	for (int i = 0; i < MD5_DIGEST_LENGTH; i++)
+	{
+		sprintf(buffer, "%02x", fingerprint[i]);
+		(*original_fwrite)(buffer, sizeof(char), strlen(buffer), logFile);
+	}
+
+	/* add new line to mark the end of the log entry */
+	sprintf(buffer, "\n");
 	(*original_fwrite)(buffer, sizeof(char), strlen(buffer), logFile);
 
 	/* Clean Up */
 	free(date2);
 	fclose(logFile);
+	free(fingerprint);
 }
 
 FILE *fopen(const char *pathname, const char *mode)
@@ -119,7 +139,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
  * Please note that the path of the file must not exceed BUFLEN -1
  * bytes in order to avoid memory corruption.
 */
-char *getFilePath(FILE *stream, const char *filename, int mode)
+static char *getFilePath(FILE *stream, const char *filename, int mode)
 {
 
 	char *buff = malloc(sizeof(char) * BUFSIZE);
@@ -136,6 +156,7 @@ char *getFilePath(FILE *stream, const char *filename, int mode)
 		exit(EXIT_FAILURE);
 	}
 
+	/* Filepath for fwrite */
 	if (mode == GET_FILE_NAME_FWRITE_MODE && stream != NULL)
 	{
 		sprintf(filepath, "/proc/self/fd/%d", stream->_fileno); /* same as fileno(stream)  */
@@ -143,6 +164,7 @@ char *getFilePath(FILE *stream, const char *filename, int mode)
 		ssize_t linksize = readlink(filepath, buff, BUFSIZE);
 		buff[linksize] = '\0';
 	}
+	/* Filepath for fopen */
 	else if (mode == GET_FILE_NAME_FOPEN_MODE && filename != NULL)
 	{
 		getcwd(filepath, BUFSIZE - 1);
@@ -161,4 +183,44 @@ char *getFilePath(FILE *stream, const char *filename, int mode)
 	free(filepath);
 
 	return buff;
+}
+
+/* Calculate fingerprint of the given filename using MD5 hash */
+static unsigned char *CalculateFingerprint(const char *filename)
+{
+	unsigned char *fingerprint = (unsigned char *)malloc(sizeof(unsigned char) * MD5_DIGEST_LENGTH);
+	if (fingerprint == NULL)
+	{
+		fprintf(stderr, "insufficient memory\n");
+		return NULL;
+	}
+
+	FILE *(*original_fopen)(const char *, const char *);
+	original_fopen = dlsym(RTLD_NEXT, "fopen");
+	int i;
+	FILE *inFile = (*original_fopen)(filename, "rb");
+	MD5_CTX mdContext;
+	int bytes;
+	unsigned char data[1024];
+
+	if (inFile == NULL)
+	{
+		printf("%s can't be opened.\n", filename);
+		return NULL;
+	}
+
+	/*Hash the file*/
+	MD5_Init(&mdContext);
+	while ((bytes = fread(data, 1, 1024, inFile)) != 0)
+		MD5_Update(&mdContext, data, bytes);
+	MD5_Final(fingerprint, &mdContext);
+
+#ifdef _DEBUG_
+	for (i = 0; i < MD5_DIGEST_LENGTH; i++)
+		printf("%02x", fingerprint[i]);
+	printf(" %s\n", filename);
+#endif
+	/*clean up*/
+	fclose(inFile);
+	return fingerprint;
 }
