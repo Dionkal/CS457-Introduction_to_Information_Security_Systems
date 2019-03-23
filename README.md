@@ -67,3 +67,10 @@ the file with fclose.
 **RUNNING:** In order to run demo with the modified shared object you need to type the following command:
 
 	`tty1 $ LD_PRELOAD=./logger.so ./demo`
+
+
+### LOG MONITORING
+
+Develop a separate monitoring application (monitor.c), responsible for monitoring the logs created by Event logger (Task 1).
+
+1. Parses the log generated from Event logger in Task1 and extracts all incidents where malicious users tried to access multiple files without permissions. Inparticular, as an output, it prints all users that tried to access more than 10 different files.
