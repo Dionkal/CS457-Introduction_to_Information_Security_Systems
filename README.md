@@ -47,10 +47,10 @@ also test your logging system against a ransomware, so your access control loggi
 
 #### TODO
 
-- Add fingerprint field in log file (MD5 Hashing) (Done fwrite fingerprint doesn't update before closing the file)
+- Add fingerprint field in log file (MD5 Hashing) (Done)
 - Make fopen and fwrite log field display failure whenever a function fails for whatever reason (Done)
 - Print correct filename and path in log file when calling fwrite (Done)
-- Add file creation log entry when fopen creates file
+- Add file creation log entry when fopen creates file (Done)
 
 #### IMPORTANT:
 
@@ -60,7 +60,8 @@ also test your logging system against a ransomware, so your access control loggi
 
 
 **Note:** Fopen logs access denied when errno is set to EACCES, whereas fwrites logs access denied whenever it fails.
-{: .note}
+Also note that frwite doesn't update the fingerprint of the file. The fingerprint will change only after the user closes
+the file with fclose.
 
 
 **RUNNING:** In order to run demo with the modified shared object you need to type the following command:

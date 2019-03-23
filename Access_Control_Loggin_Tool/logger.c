@@ -88,6 +88,8 @@ FILE *fopen(const char *pathname, const char *mode)
 	FILE *(*original_fopen)(const char *, const char *);
 	original_fopen = dlsym(RTLD_NEXT, "fopen");
 
+	/* check if file exists */
+	int fcreate_flag = access(pathname, F_OK);
 	/* Actual call of fopen */
 	FILE *original_fopen_return = (*original_fopen)(pathname, mode);
 
@@ -97,7 +99,11 @@ FILE *fopen(const char *pathname, const char *mode)
 	if (errno == EACCES)
 		LogStuff(filepath, TYPE_OPEN_FILE, ACTION_FILE_FAILURE);
 	else
+	{
+		if (fcreate_flag == -1)
+			LogStuff(filepath, TYPE_CREATE_FILE, ACTION_FILE_SUCCESS);
 		LogStuff(filepath, TYPE_OPEN_FILE, ACTION_FILE_SUCCESS);
+	}
 
 	/* Clean Up */
 	free(filepath);
