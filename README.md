@@ -45,12 +45,16 @@ also test your logging system against a ransomware, so your access control loggi
 
 ### EVENT LOGGING
 
-#### TODO
+As a first task, you need to develop a shared library (logger.so) which overrides (usingLD_PRELOAD) the standard I/O library of C in order to get and log the needed information for each file access before continuing with the standard I/O operation. Each entry (row) has to follow the following format (columns):
 
-- Add fingerprint field in log file (MD5 Hashing) (Done)
-- Make fopen and fwrite log field display failure whenever a function fails for whatever reason (Done)
-- Print correct filename and path in log file when calling fwrite (Done)
-- Add file creation log entry when fopen creates file (Done)
+a. **UID**​: Unique ID (integer) assigned to the user by the system.
+b. **File name**​: The path and name of the accessed file.
+c. **Date**​: The date this action occurred.
+d. ​**Time​**: The time this action occurred.
+e. **Type**​: This field describes whether the corresponding file was opened for read or write. It prints 0 for the creation of a file, 1 if the action performed to this file was an open and 2 if it was a write.
+f. **Action denied​**: This field reports if the action was denied to the user with no access privileges. It prints 1 if the action was denied to the user, or 0 otherwise.
+g. **Fingerprint​**: This field reports the digital fingerprint of the file the time the event occurred. This digital fingerprint is the hash value of the file contents.
+
 
 #### IMPORTANT:
 
