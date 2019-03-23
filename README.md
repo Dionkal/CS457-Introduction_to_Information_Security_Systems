@@ -47,13 +47,13 @@ also test your logging system against a ransomware, so your access control loggi
 
 As a first task, you need to develop a shared library (logger.so) which overrides (usingLD_PRELOAD) the standard I/O library of C in order to get and log the needed information for each file access before continuing with the standard I/O operation. Each entry (row) has to follow the following format (columns):
 
-a. **UID**​: Unique ID (integer) assigned to the user by the system.
-b. **File name**​: The path and name of the accessed file.
-c. **Date**​: The date this action occurred.
-d. ​**Time​**: The time this action occurred.
-e. **Type**​: This field describes whether the corresponding file was opened for read or write. It prints 0 for the creation of a file, 1 if the action performed to this file was an open and 2 if it was a write.
-f. **Action denied​**: This field reports if the action was denied to the user with no access privileges. It prints 1 if the action was denied to the user, or 0 otherwise.
-g. **Fingerprint​**: This field reports the digital fingerprint of the file the time the event occurred. This digital fingerprint is the hash value of the file contents.
+- **UID**​: Unique ID (integer) assigned to the user by the system.
+- **File name**​: The path and name of the accessed file.
+- **Date**​: The date this action occurred.
+- ​**Time​**: The time this action occurred.
+- **Type**​: This field describes whether the corresponding file was opened for read or write. It prints 0 for the creation of a file, 1 if the action performed to this file was an open and 2 if it was a write.
+- **Action denied​**: This field reports if the action was denied to the user with no access privileges. It prints 1 if the action was denied to the user, or 0 otherwise.
+- **Fingerprint​**: This field reports the digital fingerprint of the file the time the event occurred. This digital fingerprint is the hash value of the file contents.
 
 
 #### IMPORTANT:
