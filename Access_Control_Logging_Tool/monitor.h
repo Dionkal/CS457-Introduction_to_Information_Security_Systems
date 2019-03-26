@@ -34,4 +34,15 @@ logEntry *parseLine(char *line);
 /* prints the given logEntry e */
 void printLogEntry(logEntry *e);
 
+/* Finds malicious Users */
+void MonitorMode_MaliciousUsers();
+
+/* Checks file history */
+void MonitorMode_File(char *filename);
+
+/* Checks to see if there are created more than n files in the last 20 minutes*/
+void MonitorMode_NumberOfFiles(int n);
+
+/* Finds encrypted files */
+void MonitorMode_EncryptedFiles();
 #endif

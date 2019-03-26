@@ -8,7 +8,7 @@
 #define _LOG_PATH_ "my_logfile.log"
 
 /* uncomment the line below for verbose output */
-#define DEBUG
+// #define DEBUG
 
 /*
  * prints to stdout a message with the correct usage of the program
@@ -34,16 +34,16 @@ int main(int argc, char *argv[])
         switch (opt)
         {
         case 'm':
-            printf("Print malicious users\n");
+            MonitorMode_MaliciousUsers();
             break;
         case 'e':
-            printf("Prints encrypted files\n");
+            MonitorMode_EncryptedFiles();
             break;
         case 'i':
-            printf("Case i: \"%s\"\n", optarg);
+            MonitorMode_File(optarg);
             break;
         case 'v':
-            printf("Case v: \"%s\"\n", optarg);
+            MonitorMode_NumberOfFiles(atoi(optarg));
             break;
         case 'h':
             printUsage();
@@ -60,7 +60,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // parseLog();
     return 0;
 }
 
@@ -89,9 +88,9 @@ void parseLog()
     size_t i = 0;
     while (getline(&log_entry_string, &i, fd) != -1)
     {
-        printf("Line: %s\n", log_entry_string);
-
         logEntry *e = parseLine(log_entry_string);
+
+        /* Do monitor operations */
 
         /* clean up */
         free(e);
@@ -99,6 +98,10 @@ void parseLog()
         log_entry_string = NULL;
         i = 0;
     }
+
+    /* clean up */
+    free(log_entry_string);
+    fclose(fd);
 }
 
 /* Tokenizes the parsed line into a logEntry type */
@@ -142,4 +145,24 @@ logEntry *parseLine(char *line)
 #endif
 
     return e;
+}
+
+void MonitorMode_MaliciousUsers()
+{
+    printf("++++++++Begin malicious users operation++++++++\n");
+}
+
+void MonitorMode_File(char *filename)
+{
+    printf("++++++++Begin file history operation (%s)++++++++\n", filename);
+}
+
+void MonitorMode_NumberOfFiles(int n)
+{
+    printf("++++++++Begin number of files operation (%d)++++++++\n", n);
+}
+
+void MonitorMode_EncryptedFiles()
+{
+    printf("++++++++Begin encrypted files operation++++++++\n");
 }
