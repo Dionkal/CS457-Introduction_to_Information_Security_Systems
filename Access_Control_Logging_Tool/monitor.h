@@ -5,7 +5,6 @@
 #include <time.h>
 
 typedef struct logEntry logEntry;
-typedef struct user user;
 
 struct logEntry
 {
@@ -18,13 +17,6 @@ struct logEntry
     unsigned char *fingerprint;
 };
 
-struct user
-{
-    uid_t uid;        /* username id */
-    char **filenames; /* files that the user has tried to unsuccesfully access */
-    int isMalicious;  /* Flag for malicious users */
-};
-
 /* Parses the log file */
 void parseLog(void *ptr, void (*dispatcher)(logEntry *, void *));
 
@@ -34,18 +26,4 @@ logEntry *parseLine(char *line);
 /* prints the given logEntry e */
 void printLogEntry(logEntry *e);
 
-/* Finds malicious Users */
-void MonitorMode_MaliciousUsers();
-
-/* Checks file history */
-void MonitorMode_File(char *filename);
-
-/*
- * Checks to see if there are created more
- * than n files in the last 20 minutes.
-*/
-void MonitorMode_NumberOfFiles(int n);
-
-/* Finds encrypted files */
-void MonitorMode_EncryptedFiles();
 #endif

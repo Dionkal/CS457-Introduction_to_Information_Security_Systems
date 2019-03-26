@@ -7,7 +7,7 @@ TARGETS = logger demo monitor
 
 all: $(TARGETS)
 
-monitor: monitor.c
+monitor: monitor.c monitor_users.c monitor_file.c monitor_file_creation.c monitor_encrypted_files.c
 	$(CC) $(CFLAGS)  $^ -o $@
 
 demo: demo.c

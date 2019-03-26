@@ -10,6 +10,13 @@
 /* uncomment the line below for verbose output */
 // #define DEBUG
 
+/* externals */
+/* Finds malicious Users */
+extern void MonitorMode_MaliciousUsers();
+extern void MonitorMode_File(char *filename);
+extern void MonitorMode_NumberOfFiles(int n);
+extern void MonitorMode_EncryptedFiles();
+
 /*
  * prints to stdout a message with the correct usage of the program
 */
@@ -146,31 +153,4 @@ logEntry *parseLine(char *line)
 #endif
 
     return e;
-}
-
-void ParseMode_MaliciousUsers(logEntry *e, void *ptr)
-{
-    printf("---------malicious user line---------\n");
-    printLogEntry(e);
-}
-
-void MonitorMode_MaliciousUsers()
-{
-    printf("++++++++Begin malicious users operation++++++++\n");
-    parseLog(NULL, ParseMode_MaliciousUsers);
-}
-
-void MonitorMode_File(char *filename)
-{
-    printf("++++++++Begin file history operation (%s)++++++++\n", filename);
-}
-
-void MonitorMode_NumberOfFiles(int n)
-{
-    printf("++++++++Begin number of files operation (%d)++++++++\n", n);
-}
-
-void MonitorMode_EncryptedFiles()
-{
-    printf("++++++++Begin encrypted files operation++++++++\n");
 }
