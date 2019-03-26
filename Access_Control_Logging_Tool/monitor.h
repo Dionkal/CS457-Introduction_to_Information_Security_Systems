@@ -25,10 +25,13 @@ struct user
     int isMalicious;  /* Flag for malicious users */
 };
 
-/* prints the given logEntry e */
-void printLogEntry(logEntry *e);
-
 /* Parses the log file */
 void parseLog();
+
+/* Tokenizes the parsed line into a logEntry type */
+logEntry *parseLine(char *line);
+
+/* prints the given logEntry e */
+void printLogEntry(logEntry *e);
 
 #endif

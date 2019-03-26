@@ -10,9 +10,57 @@
 /* uncomment the line below for verbose output */
 #define DEBUG
 
-int main()
+/*
+ * prints to stdout a message with the correct usage of the program
+*/
+void printUsage()
 {
-    parseLog();
+    printf("Usage: monitor -[meh] | -[i <filename>] | -[v <number of files>]\n");
+    printf("-m: Print malicious users\n");
+    printf("-i <filename>: Print table of users that modified the file <filename> and the number of modifications\n");
+    printf("-v <number of files>: If more than <number of files> files were created the last 20 minutes, it prints\n"
+           "                      the total number, otherwise it prints a notification message that the logfile\n"
+           "                      parsing was succesfully completedwith no suspicious results\n");
+    printf("-e: Prints all the files that were encrypted by the ransomware\n");
+    printf("-h: Prints this help message\n");
+}
+
+int main(int argc, char *argv[])
+{
+    int opt;
+
+    if ((opt = getopt(argc, argv, "mehi:v:")) != -1)
+    {
+        switch (opt)
+        {
+        case 'm':
+            printf("Print malicious users\n");
+            break;
+        case 'e':
+            printf("Prints encrypted files\n");
+            break;
+        case 'i':
+            printf("Case i: \"%s\"\n", optarg);
+            break;
+        case 'v':
+            printf("Case v: \"%s\"\n", optarg);
+            break;
+        case 'h':
+            printUsage();
+            return 0;
+            break;
+        default:
+            printUsage();
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        printUsage();
+        exit(EXIT_FAILURE);
+    }
+
+    // parseLog();
     return 0;
 }
 
@@ -43,46 +91,55 @@ void parseLog()
     {
         printf("Line: %s\n", log_entry_string);
 
-        logEntry e;
+        logEntry *e = parseLine(log_entry_string);
 
-        /* uid */
-        char *token = strtok(log_entry_string, ",");
-        assert(token != NULL);
-        e.uid = atol(token);
-        /* filename */
-        token = strtok(NULL, ",");
-        assert(token != NULL);
-        e.filename = token;
-        /* date */
-        token = strtok(NULL, ",");
-        assert(token != NULL);
-        e.date = token;
-        /* time */
-        token = strtok(NULL, ",");
-        assert(token != NULL);
-        e.time = atol(token);
-        /* type */
-        token = strtok(NULL, ",");
-        assert(token != NULL);
-        e.type = atoi(token);
-        /* action_denied */
-        token = strtok(NULL, ",");
-        assert(token != NULL);
-        e.action_denied = atoi(token);
-        /* fingerprint */
-        token = strtok(NULL, ",");
-        assert(token != NULL);
-        e.fingerprint = (unsigned char *)token;
-        token = strtok(NULL, ",");
-        assert(token == NULL);
+        /* clean up */
+        free(e);
+        free(log_entry_string);
+        log_entry_string = NULL;
+        i = 0;
+    }
+}
+
+/* Tokenizes the parsed line into a logEntry type */
+logEntry *parseLine(char *line)
+{
+    logEntry *e = malloc(sizeof(logEntry));
+
+    /* uid */
+    char *token = strtok(line, ",");
+    assert(token != NULL);
+    e->uid = atol(token);
+    /* filename */
+    token = strtok(NULL, ",");
+    assert(token != NULL);
+    e->filename = token;
+    /* date */
+    token = strtok(NULL, ",");
+    assert(token != NULL);
+    e->date = token;
+    /* time */
+    token = strtok(NULL, ",");
+    assert(token != NULL);
+    e->time = atol(token);
+    /* type */
+    token = strtok(NULL, ",");
+    assert(token != NULL);
+    e->type = atoi(token);
+    /* action_denied */
+    token = strtok(NULL, ",");
+    assert(token != NULL);
+    e->action_denied = atoi(token);
+    /* fingerprint */
+    token = strtok(NULL, "\n");
+    assert(token != NULL);
+    e->fingerprint = (unsigned char *)token;
+    token = strtok(NULL, ",");
+    assert(token == NULL);
 
 #ifdef DEBUG
-        printLogEntry(&e);
+    printLogEntry(e);
 #endif
-    }
 
-    /* clean up */
-    free(log_entry_string);
-    log_entry_string = NULL;
-    i = 0;
+    return e;
 }
