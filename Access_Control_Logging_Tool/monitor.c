@@ -75,7 +75,7 @@ void printLogEntry(logEntry *e)
     printf("fingerprint: %s\n", e->fingerprint);
 }
 
-void parseLog()
+void parseLog(void *ptr, void (*dispatcher)(logEntry *, void *))
 {
     char *log_entry_string = NULL;
     FILE *fd = fopen(_LOG_PATH_, "r");
@@ -91,6 +91,7 @@ void parseLog()
         logEntry *e = parseLine(log_entry_string);
 
         /* Do monitor operations */
+        (*dispatcher)(e, ptr);
 
         /* clean up */
         free(e);
@@ -147,9 +148,16 @@ logEntry *parseLine(char *line)
     return e;
 }
 
+void ParseMode_MaliciousUsers(logEntry *e, void *ptr)
+{
+    printf("---------malicious user line---------\n");
+    printLogEntry(e);
+}
+
 void MonitorMode_MaliciousUsers()
 {
     printf("++++++++Begin malicious users operation++++++++\n");
+    parseLog(NULL, ParseMode_MaliciousUsers);
 }
 
 void MonitorMode_File(char *filename)

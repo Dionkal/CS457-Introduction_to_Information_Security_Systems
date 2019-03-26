@@ -26,7 +26,7 @@ struct user
 };
 
 /* Parses the log file */
-void parseLog();
+void parseLog(void *ptr, void (*dispatcher)(logEntry *, void *));
 
 /* Tokenizes the parsed line into a logEntry type */
 logEntry *parseLine(char *line);
@@ -40,7 +40,10 @@ void MonitorMode_MaliciousUsers();
 /* Checks file history */
 void MonitorMode_File(char *filename);
 
-/* Checks to see if there are created more than n files in the last 20 minutes*/
+/*
+ * Checks to see if there are created more
+ * than n files in the last 20 minutes.
+*/
 void MonitorMode_NumberOfFiles(int n);
 
 /* Finds encrypted files */
