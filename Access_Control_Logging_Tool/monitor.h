@@ -4,6 +4,18 @@
 #include <unistd.h>
 #include <time.h>
 
+/* Path to log file */
+#define _LOG_PATH_ "my_logfile.log"
+
+/* FILE ACTION TYPE MACROS */
+#define TYPE_CREATE_FILE 0
+#define TYPE_OPEN_FILE 1
+#define TYPE_WRITE_FILE 2
+
+/* FILE ACCESS MACROS */
+#define ACTION_FILE_SUCCESS 0
+#define ACTION_FILE_FAILURE 1
+
 typedef struct logEntry logEntry;
 
 struct logEntry

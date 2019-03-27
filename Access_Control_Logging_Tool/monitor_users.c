@@ -7,7 +7,7 @@ static User **users;
 static int nmbOfUsers = 0;
 
 /* uncomment the line below for verbose output */
-// #define DEBUG
+/* #define DEBUG */
 
 #define MALICIOUS_FILES_NUMBER 10
 
@@ -37,7 +37,7 @@ void ParseMode_MaliciousUsers(logEntry *e, void *ptr)
 {
 	printf("---------malicious user line---------\n");
 
-	if (e->action_denied == 0) /* we don't care about succesfull accesses*/
+	if (e->action_denied == ACTION_FILE_SUCCESS) /* we don't care about succesfull accesses*/
 		return;
 
 	User *u = isInUsers(e->uid);
