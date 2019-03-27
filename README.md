@@ -42,6 +42,7 @@ use LD_PRELOAD which gives the ability to instruct the linker to bind symbols pr
 the C standard library functions that handle file accesses and modifications (fopen,fwrite) with your own versions in order to extend their functionality. You will
 also test your logging system against a ransomware, so your access control logging needs to be able to detect ransomware behavior.
 
+------------------------
 
 ### EVENT LOGGING
 
@@ -104,12 +105,13 @@ Ransomware is a type of malicious software that is used to block access to files
 Log monitor receives the required arguments from the command line upon execution as such:
 
 Options:
-**-m**​, Print malicious users.
 
-**-i < filename >​**, Print table of users that modified the file < filename > and the number of modifications.
+-**-m**​, Print malicious users.
 
-**-v < number of files > ​**, If more than < number of files > files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
+-**-i < filename >​**, Print table of users that modified the file < filename > and the number of modifications.
 
-**-e**​, Prints all the files that were encrypted by the ransomware.
+-**-v < number of files > ​**, If more than < number of files > files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
 
-**-h​**, Help message.
+-**-e**​, Prints all the files that were encrypted by the ransomware.
+
+-**-h​**, Help message.
