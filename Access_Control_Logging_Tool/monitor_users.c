@@ -28,7 +28,9 @@ void MonitorMode_MaliciousUsers()
 #endif
 	/* find and print malicious users */
 	printMaliciousUsers();
-	/* TODO: Cleanup users */
+
+	/* Clean up */
+	cleanUsers();
 }
 
 void ParseMode_MaliciousUsers(logEntry *e, void *ptr)
@@ -158,7 +160,13 @@ void printMaliciousUsers()
 */
 void cleanUsers()
 {
-	/* TODO parse users and clean up all the User structs*/
+	int i = 0;
+	while (i < nmbOfUsers)
+	{
+		cleanFileNames(users[i]);
+		free(users[i]);
+		i++;
+	}
 }
 
 /* ================Filenames Operations================ */
@@ -208,5 +216,14 @@ void printFilenames(User *u)
 */
 void cleanFileNames(User *u)
 {
-	/* TODO Clean all the filenames of the given user u*/
+	if (u == NULL)
+		return;
+
+	int i = 0;
+	while (i < u->nmbrOfFiles)
+	{
+		free(u->filenames[i]);
+		i++;
+	}
+	free(u->filenames);
 }
