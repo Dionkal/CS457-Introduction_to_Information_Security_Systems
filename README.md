@@ -78,6 +78,7 @@ the file with fclose.
 
 	`tty1 $ LD_PRELOAD=./logger.so ./demo`
 
+------------------------
 
 ### LOG MONITORING
 
@@ -95,9 +96,8 @@ Ransomware is a type of malicious software that is used to block access to files
 
 	**Note**: **x** ​is an integer specified by the user as input (e.g. find if more than 40 files where created the last 20 minutes).
 
-   2. Ransomware will also try to encrypt files and discard the unencrypted version. You need to find and report all the events in the log where a ransomware opened an unencrypted file and created an encrypted one. Encrypted files end with the suffix **".encrypt"**
+   2. Ransomware will also try to encrypt files and discard the unencrypted version. You need to find and report all the events in the log where a ransomware opened an unencrypted file and created an encrypted one. Encrypted files end with the suffix **".encrypt"**.
 
-------------------------
 
 #### TOOL SPECIFICATIONS
 
@@ -106,9 +106,9 @@ Log monitor receives the required arguments from the command line upon execution
 Options:
 **-m**​, Print malicious users.
 
-**-i <filename>​**, Print table of users that modified the file <filename> and the number of modifications.
+**-i < filename >​**, Print table of users that modified the file < filename > and the number of modifications.
 
-**-v <numberoffiles>​**, If more than <numberoffiles> files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
+**-v < number of files > ​**, If more than < number of files > files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
 
 **-e**​, Prints all the files that were encrypted by the ransomware.
 
