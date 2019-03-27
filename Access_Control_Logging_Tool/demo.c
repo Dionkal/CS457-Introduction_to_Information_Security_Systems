@@ -3,7 +3,7 @@
 
 int main()
 {
-	FILE *fd = fopen("test.dat", "a+");
+	FILE *fd = fopen("test.dat", "r");
 
 	if (fd == NULL)
 	{

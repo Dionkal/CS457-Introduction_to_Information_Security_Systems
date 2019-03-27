@@ -41,6 +41,13 @@ int updateUsers(logEntry *e, User *u);
 void printUser(User *u);
 
 /*
+ * Iterates the users stracture and if a user entry has MALICIOUS_FILES_NUMBER
+ * or more access_denied then it flags him as a malicious user and prints him.
+ *
+*/
+void printMaliciousUsers();
+
+/*
  * Cleans up all the User structs of users
 */
 void cleanUsers();

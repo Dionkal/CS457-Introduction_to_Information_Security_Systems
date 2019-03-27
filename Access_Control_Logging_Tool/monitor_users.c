@@ -7,13 +7,27 @@ static User **users;
 static int nmbOfUsers = 0;
 
 /* uncomment the line below for verbose output */
-#define DEBUG
+// #define DEBUG
+
+#define MALICIOUS_FILES_NUMBER 10
 
 void MonitorMode_MaliciousUsers()
 {
 
 	printf("++++++++Beginning malicious users operation++++++++\n");
 	parseLog(NULL, ParseMode_MaliciousUsers);
+
+#ifdef DEBUG
+	/* print users table */
+	int i = 0;
+	while (i < nmbOfUsers)
+	{
+		printUser(users[i]);
+		i++;
+	}
+#endif
+	/* find and print malicious users */
+	printMaliciousUsers();
 	/* TODO: Cleanup users */
 }
 
@@ -113,6 +127,33 @@ void printUser(User *u)
 }
 
 /*
+ * Iterates the users stracture and if a user entry has MALICIOUS_FILES_NUMBER
+ * or more access_denied then it flags him as a malicious user and prints him.
+ *
+*/
+void printMaliciousUsers()
+{
+	if (users == NULL)
+	{
+		printf("No malicious users found.\n");
+		return;
+	}
+
+	printf("================= Malicious users =================\n");
+	int i = 0;
+	while (i < nmbOfUsers)
+	{
+		if ((users[i])->nmbrOfFiles >= MALICIOUS_FILES_NUMBER)
+		{
+			(users[i])->isMalicious = 1;
+			printf("%d: %d\n", i, (users[i])->uid);
+		}
+
+		i++;
+	}
+}
+
+/*
  * Cleans up all the User structs of users
 */
 void cleanUsers()
@@ -158,6 +199,7 @@ void printFilenames(User *u)
 	while (i < u->nmbrOfFiles)
 	{
 		printf("\t\t\t\t%s\n", (u->filenames)[i]);
+		i++;
 	}
 }
 
