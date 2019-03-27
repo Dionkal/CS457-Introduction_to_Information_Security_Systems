@@ -84,3 +84,32 @@ the file with fclose.
 Develop a separate monitoring application (monitor.c), responsible for monitoring the logs created by Event logger (Task 1).
 
 1. Parses the log generated from Event logger in Task1 and extracts all incidents where malicious users tried to access multiple files without permissions. Inparticular, as an output, it prints all users that tried to access more than 10 different files.
+
+
+2. For a given file input, Log monitor tracks all users that have accessed the specific file. Bycomparing the digital fingerprints, Log monitor checks how many times the file was indeedmodified. As an output, it prints a table with the number of  times each user has modified it.
+
+
+3. **Ransomware detection:**
+Ransomware is a type of malicious software that is used to block access to files, by encrypting them. Its main goal is to extort money from users in order to decrypt their files.
+   1. In many cases ransomware tries to hide malicious files in directories populated by huge amounts of files. In this scenario a ransom will create a big volume of files. You need to find if ​**x**​ files were created in the last 20 minutes.
+
+	**Note**: **x** ​is an integer specified by the user as input (e.g. find if more than 40 files where created the last 20 minutes).
+
+   2. Ransomware will also try to encrypt files and discard the unencrypted version. You need to find and report all the events in the log where a ransomware opened an unencrypted file and created an encrypted one. Encrypted files end with the suffix **".encrypt"**
+
+------------------------
+
+#### TOOL SPECIFICATIONS
+
+Log monitor receives the required arguments from the command line upon execution as such:
+
+Options:
+**-m**​, Print malicious users.
+
+**-i <filename>​**, Print table of users that modified the file <filename> and the number of modifications.
+
+**-v <numberoffiles>​**, If more than <numberoffiles> files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
+
+**-e**​, Prints all the files that were encrypted by the ransomware.
+
+**-h​**, Help message.
