@@ -106,12 +106,18 @@ Log monitor receives the required arguments from the command line upon execution
 
 Options:
 
--**-m**​, Print malicious users.
+- **-m**​, Print malicious users.
 
--**-i < filename >​**, Print table of users that modified the file < filename > and the number of modifications.
+- **-i < filename >​**, Print table of users that modified the file < filename > and the number of modifications.
 
--**-v < number of files > ​**, If more than < number of files > files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
+- **-v < number of files > ​**, If more than < number of files > files were created the last 20 minutes, it prints the total number,otherwise it prints a notification message that the logfile parsing was successfully completed with no suspicious results.
 
--**-e**​, Prints all the files that were encrypted by the ransomware.
+- **-e**​, Prints all the files that were encrypted by the ransomware.
 
--**-h​**, Help message.
+- **-h​**, Help message.
+
+#### DEBUG MODE:
+
+If you want a more verbose output uncoment the line
+ `#define DEBUG`
+ in the various .c files.
