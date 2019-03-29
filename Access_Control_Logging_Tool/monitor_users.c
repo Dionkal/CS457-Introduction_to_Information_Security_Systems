@@ -3,18 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-static User **users;
-static int nmbOfUsers = 0;
-
 /* uncomment the line below for verbose output */
 /* #define DEBUG */
+
+static User **users;
+static int nmbOfUsers = 0;
+int foundMaliciousUserFlag = 0;
 
 #define MALICIOUS_FILES_NUMBER 10
 
 void MonitorMode_MaliciousUsers()
 {
-
-	printf("++++++++Beginning malicious users operation++++++++\n");
 	parseLog(NULL, ParseMode_MaliciousUsers);
 
 #ifdef DEBUG
@@ -35,7 +34,6 @@ void MonitorMode_MaliciousUsers()
 
 void ParseMode_MaliciousUsers(logEntry *e, void *ptr)
 {
-	printf("---------malicious user line---------\n");
 
 	if (e->action_denied == ACTION_FILE_SUCCESS) /* we don't care about succesfull accesses*/
 		return;
@@ -135,7 +133,7 @@ void printUser(User *u)
 */
 void printMaliciousUsers()
 {
-	if (users == NULL)
+	if (!foundMaliciousUserFlag)
 	{
 		printf("No malicious users found.\n");
 		return;
@@ -148,7 +146,7 @@ void printMaliciousUsers()
 		if ((users[i])->nmbrOfFiles >= MALICIOUS_FILES_NUMBER)
 		{
 			(users[i])->isMalicious = 1;
-			printf("%d: %d\n", i, (users[i])->uid);
+			printf("%d: %d\t Failed Accesses:%d\n", i, (users[i])->uid, (users[i])->nmbrOfFiles);
 		}
 
 		i++;
@@ -190,6 +188,11 @@ char *insertInFileNames(User *u, const char *str, int strSize)
 {
 	/* Get new filename entry*/
 	u->nmbrOfFiles++;
+
+	if (u->nmbrOfFiles >= MALICIOUS_FILES_NUMBER) /* flag for printing purpuses */
+		foundMaliciousUserFlag = 1;
+
+	/* allocate memory for a new filename entry */
 	u->filenames = realloc(u->filenames, sizeof(char *) * u->nmbrOfFiles);
 
 	/* Copy the string */
