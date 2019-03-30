@@ -125,6 +125,10 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 	/* Actual call of fwrite */
 	size_t original_fwrite_return = (*original_fwrite)(ptr, size, nmemb, stream);
+	if (fflush(stream) != 0)
+	{
+		perror("Error at fsync \n");
+	}
 
 	/* Get file name Vodoo*/
 	char *file_name = getFilePath(stream, NULL, GET_FILE_NAME_FWRITE_MODE);
