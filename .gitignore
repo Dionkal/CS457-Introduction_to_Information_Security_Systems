@@ -16,4 +16,4 @@ Access_Control_Logging_Tool/*.so
 Access_Control_Logging_Tool/*.log
 Access_Control_Logging_Tool/*.dat
 Access_Control_Logging_Tool/monitor
-
+Access_Control_Logging_Tool/valgrind-out.txt

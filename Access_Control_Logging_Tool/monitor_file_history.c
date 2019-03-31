@@ -40,7 +40,7 @@ void ParseMode_File_History(logEntry *e, void *ptr)
 		int index = isInFiles(e->uid);
 		if (index >= 0)
 		{
-			if (strcmp(e->fingerprint, (const char *)(files[index]->fingerprint)) != 0)
+			if (memcmp(e->fingerprint, (files[index]->fingerprint), MD5_DIGEST_LENGTH) != 0)
 				UpdateFiles(e, index);
 		}
 		else
