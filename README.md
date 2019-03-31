@@ -71,8 +71,6 @@ As a first task, you need to develop a shared library (logger.so) which override
 
 
 **Note:** Fopen logs access denied when errno is set to EACCES, whereas fwrites logs access denied whenever it fails.
-Also note that frwite doesn't update the fingerprint of the file. The fingerprint will change only after the user closes
-the file with fclose.
 
 
 **RUNNING:** In order to run demo with the modified shared object you need to type the following command:

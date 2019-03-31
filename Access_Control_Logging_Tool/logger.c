@@ -127,7 +127,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 	size_t original_fwrite_return = (*original_fwrite)(ptr, size, nmemb, stream);
 	if (fflush(stream) != 0)
 	{
-		perror("Error at fsync \n");
+		perror("Error at fflush \n");
 	}
 
 	/* Get file name Vodoo*/

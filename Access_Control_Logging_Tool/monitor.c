@@ -13,7 +13,7 @@
 /* externals */
 /* Finds malicious Users */
 extern void MonitorMode_MaliciousUsers();
-extern void MonitorMode_File(char *filename);
+extern void MonitorMode_File_History(char *filename);
 extern void MonitorMode_NumberOfFiles(int n);
 extern void MonitorMode_EncryptedFiles();
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
             MonitorMode_EncryptedFiles();
             break;
         case 'i':
-            MonitorMode_File(optarg);
+            MonitorMode_File_History(optarg);
             break;
         case 'v':
             MonitorMode_NumberOfFiles(atoi(optarg));
