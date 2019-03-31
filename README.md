@@ -119,3 +119,7 @@ Options:
 If you want a more verbose output uncoment the line
  `#define DEBUG`
  in the various .c files.
+
+
+#### TODO:
+In file history monitoring fix fingerprint displaying issue

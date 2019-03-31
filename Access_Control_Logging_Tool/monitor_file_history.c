@@ -5,26 +5,23 @@
 #include <stdlib.h>
 
 /* uncomment the line below for verbose output */
-#define DEBUG
+// #define DEBUG
 
 static file_history **files;
 static int nmbrOfEntries = 0;
 
 void MonitorMode_File_History(char *filename)
 {
-	printf("++++++++Begin file history operation (%s)++++++++\n", filename);
 	parseLog(filename, ParseMode_File_History);
 
-#ifdef DEBUG
 	int i;
-	printf("-------Printing File History-------\n");
+	printf("--------------Printing File History--------------\n");
 	for (i = 0; i < nmbrOfEntries; i++)
 	{
 		printf("Entry #%d\n", i);
 		printFileHistory(files[i]);
-		printf("--------------\n");
+		printf("-------------------------------------------------\n");
 	}
-#endif
 
 	CleanFiles();
 }
