@@ -65,15 +65,12 @@ void encryptFile(char *filename)
 	unsigned char *key = aes_read_key("aes_key.txt");
 	// unsigned char *iv = (unsigned char *)"143278389942760";
 
-	AES_KEY enc_key;
-	AES_set_encrypt_key(key, 32 * 8, &enc_key);
-
 	FILE *fd_src = fopen(filename, "r");
 	if (fd_src == NULL)
 		return;
 
 #ifdef _DEBUG_
-		// printf("Opened source file: %s\n", filename);
+	printf("Opened source file: %s\n", filename);
 #endif
 
 	/* create and open a new file with suffix encrypt */
@@ -84,7 +81,7 @@ void encryptFile(char *filename)
 		return;
 
 #ifdef _DEBUG_
-		// printf("Opened destination file: %s\n", buffer);
+	printf("Opened destination file: %s\n", buffer);
 #endif
 
 	/* read from input file, encrypt the data and then write the encrypted
@@ -114,5 +111,5 @@ void encryptFile(char *filename)
 	fclose(fd_src);
 	fclose(fd_dest);
 	free(key);
-	/* TODO delete filename */
+	remove(filename);
 }
