@@ -4,7 +4,7 @@ CFLAGS = -Wall -pedantic -std=gnu99 -ggdb3
 SUFIX = -ldl -lssl -lcrypto
 RSUFIX = -lssl -lcrypto
 
-TARGETS = logger demo monitor ransom
+TARGETS = logger demo monitor ransom decryptor
 
 all: $(TARGETS)
 
@@ -17,8 +17,11 @@ demo: demo.c
 logger: logger.c
 	$(CC) $(CSHAREDFLAGS) $^ -o logger.so $(SUFIX)
 
-ransom: ransomware/wannal4ugh.c
-	$(CC) $(CFLAGS) ransomware/wannal4ugh.c -o wannal4ugh $(RSUFIX)
+ransom: ransomware/wannal4ugh.c ransomware/cs457_crypto.c
+	$(CC) $(CFLAGS) $(RSUFIX) ransomware/cs457_crypto.c ransomware/wannal4ugh.c -o ransomware/wannal4ugh
+
+decryptor: ransomware/decryptor.c ransomware/cs457_crypto.c
+	$(CC) $(CFLAGS) $(RSUFIX) ransomware/cs457_crypto.c ransomware/decryptor.c -o ransomware/decryptor
 
 clean:
-	rm -f demo *.so  *.o monitor
+	rm -f demo *.so  *.o monitor ransomware/wannal4ugh ransomware/*.o ransomware/decryptor
