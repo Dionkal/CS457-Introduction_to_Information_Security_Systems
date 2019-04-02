@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* uncomment the line below for verbose output */
-#define DEBUG
+// #define DEBUG
 
 static encrypted_files **eFiles;
 static int numOfEntries = 0;
@@ -29,11 +29,16 @@ void MonitorMode_EncryptedFiles()
 void ParseMode_FindEncryptedFiles(logEntry *e, void *ptr)
 {
 	int res;
-	if (isEncryptSuffix(e->filename))
+	int enc_suffix = isEncryptSuffix(e->filename);
+#ifdef DEBUG
+	printLogEntry(e);
+	printf("Has encrypted suffix: %d\n", enc_suffix);
+#endif
+
+	if (enc_suffix)
 	{ /* search if the filename without the encrypt suffix exists */
 		char bufname[BUFSIZ];
 		strncpy(bufname, e->filename, strlen(e->filename) - 8);
-		// printf("Name w/o suffix: %s\n", bufname);
 		res = isInEncryptedFiles(bufname);
 		if (res > -1)
 			updatedEncryptedFile(e, res);
@@ -53,12 +58,15 @@ int isInEncryptedFiles(char *filename)
 	for (i = 0; i < numOfEntries; i++)
 	{
 		if (strcmp(filename, eFiles[i]->filename) == 0)
+		{
 			return i;
+		}
 	}
+
 	return -1;
 }
 
-/* 
+/*
  * Creates a new encrypted file entry based on the data
  * from the given log entry e and appends it to the efiles
  * table.
@@ -155,7 +163,7 @@ int isEncryptSuffix(char *filename)
 	assert(filename != NULL);
 	/* 8: lenght of .encrypt suffix */
 	int encrypted_str_len = strlen(filename);
-	if (encrypted_str_len > 8 && strcmp(filename + (encrypted_str_len - 9), ".encrypt"))
+	if (encrypted_str_len > 8 && (strcmp(filename + (encrypted_str_len - 8), ".encrypt") == 0))
 	{
 		return 1;
 	}

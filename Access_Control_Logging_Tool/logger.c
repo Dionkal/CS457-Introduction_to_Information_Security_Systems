@@ -14,7 +14,7 @@
 #define _LOG_PATH_ "my_logfile.log"
 
 /* Uncomment the next line for more verbose output */
-#define _DEBUG_
+// #define _DEBUG_
 
 /* FILE ACTION TYPE MACROS */
 #define TYPE_CREATE_FILE 0
