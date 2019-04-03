@@ -129,7 +129,7 @@ In file history monitoring fix fingerprint displaying issue
 
 ### RANSOMWARE:
 
-This tool should be used with caution, see options below: 
+This tool should be used with caution, see options below:
 
 Usage: wannalaugh  -[e < directory >]  -[o < number of files >]
 
@@ -140,3 +140,9 @@ Usage: wannalaugh  -[e < directory >]  -[o < number of files >]
 - **-v:** Prints the current version.
 
 - **-h:** Prints this help message.
+
+
+**Note:** To decrypt a file encrypted by the ransomware, use the decryptor tool.
+Sample usage:
+
+`tty $./decryptor -i < input file > -o < output file >`
