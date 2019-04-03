@@ -117,9 +117,26 @@ Options:
 #### DEBUG MODE:
 
 If you want a more verbose output uncoment the line
- `#define DEBUG`
- in the various .c files.
+
+`#define DEBUG`
+
+in the various .c files.
 
 
 #### TODO:
 In file history monitoring fix fingerprint displaying issue
+
+
+### RANSOMWARE:
+
+This tool should be used with caution, see options below: 
+
+Usage: wannalaugh  -[e < directory >]  -[o < number of files >]
+
+- **-e < directory >:** Encrypts all files in the given directory.
+
+- **-o < filename >:** Obfuscates ransom detection by creating Y files in the given directory.
+
+- **-v:** Prints the current version.
+
+- **-h:** Prints this help message.
