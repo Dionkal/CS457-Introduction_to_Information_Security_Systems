@@ -142,7 +142,11 @@ Usage: wannalaugh  -[e < directory >]  -[o < number of files >]
 - **-h:** Prints this help message.
 
 
-**Note:** To decrypt a file encrypted by the ransomware, use the decryptor tool.
+**Note:** directory must contain a forward slash "/" at the end
+
+
+### (REVERSE) RANSOMWARE:
+To decrypt a file encrypted by the ransomware, use the decryptor tool.
 Sample usage:
 
 `tty $./decryptor -i < input file > -o < output file >`

@@ -6,4 +6,7 @@
 /* encrypt the given filename */
 void encryptFile(char *filename);
 
+/* Gets all the files from the given directory */
+void getFilenames(char *directory);
+
 #endif
