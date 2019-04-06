@@ -11,8 +11,8 @@ void decryptFile(char *in, char *out)
 {
 	unsigned char data[AES_BLOCK_SIZE];
 	unsigned char encrypted_data[AES_BLOCK_SIZE];
-	// unsigned char *key = aes_read_key("aes_key.txt");
-	unsigned char *key = (unsigned char *)"3DFFD7544A955E0580D2A67C7DC6E550";
+	unsigned char *key = aes_read_key("aes_key.txt");
+	// unsigned char *key = (unsigned char *)"3DFFD7544A955E0580D2A67C7DC6E550";
 
 	AES_KEY dec_key;
 	AES_set_decrypt_key(key, 32 * 8, &dec_key);
@@ -20,7 +20,10 @@ void decryptFile(char *in, char *out)
 	FILE *fd_src = fopen(in, "r");
 	if (fd_src == NULL)
 	{
-		printf("Error opening file: %s\n", in);
+		char buf[BUFSIZ];
+		sprintf(buf, "Error opening file: %s", in);
+		perror(buf);
+
 		return;
 	}
 
@@ -28,12 +31,13 @@ void decryptFile(char *in, char *out)
 	printf("Opened source file: %s\n", in);
 #endif
 
-	/* create and open a new file with suffix encrypt */
 	FILE *fd_dest = fopen(out, "w");
 
 	if (fd_dest == NULL)
 	{
-		printf("Error opening file: %s\n", out);
+		char buf[BUFSIZ];
+		sprintf(buf, "Error opening file: %s\n", out);
+		perror(buf);
 		return;
 	}
 
@@ -67,6 +71,7 @@ void decryptFile(char *in, char *out)
 	/* clean up */
 	fclose(fd_src);
 	fclose(fd_dest);
+	free(key);
 }
 
 int main(int argc, char **argv)
@@ -81,12 +86,12 @@ int main(int argc, char **argv)
 		switch (opt)
 		{
 		case 'i':
-			input_file = malloc(sizeof(char) * strlen(optarg));
+			input_file = malloc(sizeof(char) * (strlen(optarg) + 1));
 			strncpy(input_file, optarg, strlen(optarg));
 			printf("Input file: %s\n", input_file);
 			break;
 		case 'o':
-			output_file = malloc(sizeof(char) * strlen(optarg));
+			output_file = malloc(sizeof(char) * (strlen(optarg) + 1));
 			strncpy(output_file, optarg, strlen(optarg));
 			printf("Output file: %s\n", output_file);
 			break;

@@ -17,3 +17,7 @@ Access_Control_Logging_Tool/*.log
 Access_Control_Logging_Tool/*.dat
 Access_Control_Logging_Tool/monitor
 Access_Control_Logging_Tool/valgrind-out.txt
+Access_Control_Logging_Tool/ransomware/wannal4ugh
+Access_Control_Logging_Tool/ransomware/decryptor
+Access_Control_Logging_Tool/ransomware/testdir/*.encrypt
+Access_Control_Logging_Tool/ransomware/testdir/*.decrypt
