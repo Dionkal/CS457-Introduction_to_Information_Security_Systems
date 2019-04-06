@@ -9,6 +9,7 @@
 #include <openssl/aes.h>
 
 #define BUFSIZE 1024
+#define DICTIONARY_PATH "/usr/share/dict/american-english"
 
 /* Uncomment the next line for more verbose output */
 /* #define _DEBUG_*/
@@ -154,7 +155,7 @@ void ObfuscateDir(int numOfFiles)
 	if (numOfFiles < 1)
 		return;
 
-	FILE *dict_fd = fopen("/usr/share/dict/cracklib-small", "r");
+	FILE *dict_fd = fopen(DICTIONARY_PATH, "r");
 	if (dict_fd == NULL)
 	{
 		perror("Error opening dictionary");
