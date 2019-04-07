@@ -183,7 +183,15 @@ static char *getFilePath(FILE *stream, const char *filename, int mode)
 			perror("getcwd");
 			exit(EXIT_FAILURE);
 		}
-		sprintf(buff, "%s/%s", filepath, filename);
+		/* relative path */
+		if (filename[0] != '/')
+		{
+			sprintf(buff, "%s/%s", filepath, filename);
+		}
+		else /* absolute path */
+		{
+			sprintf(buff, "%s", filename);
+		}
 	}
 	else
 	{
