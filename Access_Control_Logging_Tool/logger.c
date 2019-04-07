@@ -216,7 +216,8 @@ static unsigned char *CalculateFingerprint(const char *filename)
 	if (inFile == NULL)
 	{
 		printf("%s can't be opened.\n", filename);
-		return NULL;
+		fingerprint = (unsigned char *)"fffffffffffffffffffffffffffffff";
+		return fingerprint;
 	}
 
 	/*Hash the file*/

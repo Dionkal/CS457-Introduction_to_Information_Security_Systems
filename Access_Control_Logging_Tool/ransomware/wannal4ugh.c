@@ -176,7 +176,6 @@ void ObfuscateDir(int numOfFiles)
 		filesCreated++;
 		/* clean up */
 		free(dict_str);
-		free(token);
 		dict_str = NULL;
 		i = 0;
 	}

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* uncomment the line below for verbose output */
-// #define DEBUG
+/* #define DEBUG */
 
 static file_history **files;
 static int nmbrOfEntries = 0;
@@ -30,9 +30,16 @@ void ParseMode_File_History(logEntry *e, void *ptr)
 {
 	char *filename = (char *)ptr;
 
+#ifdef DEBUG
+	printf("Input file: %s\n", filename);
+	printf("Entry file: %s\n,", e->filename);
+	printLogEntry(e);
+	printf("---------------------------------------------\n");
+#endif
+
 	/* We need to only check entries that match
 	 the given filename */
-	if (strcmp(e->filename, filename) == 0)
+	if ((strcmp(e->filename, filename) == 0) && (e->action_denied == ACTION_FILE_SUCCESS))
 	{
 		int index = isInFiles(e->uid);
 		if (index >= 0)
@@ -70,7 +77,7 @@ void insertInFiles(logEntry *e)
 	/* create and initialize a new file_history struct */
 	file_history *fh = malloc(sizeof(file_history));
 	fh->uid = e->uid;
-	memcpy(&(fh->fingerprint), e->fingerprint, MD5_DIGEST_LENGTH);
+	memcpy(fh->fingerprint, e->fingerprint, 33);
 	fh->timesModified = 1;
 
 	/* add file_history_struct to files table */
@@ -95,7 +102,7 @@ void UpdateFiles(logEntry *e, int index)
 	assert(files[index] != NULL);
 
 	/* update fingerprint */
-	memcpy(&(files[index]->fingerprint), e->fingerprint, MD5_DIGEST_LENGTH);
+	memcpy(files[index]->fingerprint, e->fingerprint, 33);
 	files[index]->timesModified++;
 
 #ifdef DEBUG
@@ -108,13 +115,7 @@ void printFileHistory(file_history *fh)
 {
 	assert(fh != NULL);
 	printf("Uid: %d\n", fh->uid);
-	printf("Fingerprint: ");
-	int i = 0;
-	while (i < MD5_DIGEST_LENGTH)
-	{
-		printf("%02x", fh->fingerprint[i]);
-		i++;
-	}
+	printf("Fingerprint: %s\n", fh->fingerprint);
 	printf("\nTimes modified: %d\n", fh->timesModified);
 }
 
@@ -127,8 +128,9 @@ void CleanFiles()
 	if (files != NULL)
 	{
 		for (int i = 0; i < nmbrOfEntries; i++)
+		{
 			free(files[i]);
-
+		}
 		free(files);
 	}
 }

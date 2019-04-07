@@ -34,7 +34,7 @@ void ParseMode_NumberOfFiles(logEntry *e, void *ptr)
 	printf("Entry type %d\n", e->type);
 #endif
 
-	if ((e->time >= (*currtime - (60 * TIME_WINDOW))) && (e->type == TYPE_CREATE_FILE))
+	if ((e->time >= (*currtime - (60 * TIME_WINDOW))) && (e->type == TYPE_CREATE_FILE) && (e->action_denied == 0))
 	{
 		printf("Found suspicious file: %s\n", e->filename);
 		files_created++;

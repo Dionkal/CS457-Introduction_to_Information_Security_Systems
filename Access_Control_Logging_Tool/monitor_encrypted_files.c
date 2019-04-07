@@ -35,6 +35,12 @@ void ParseMode_FindEncryptedFiles(logEntry *e, void *ptr)
 	printf("Has encrypted suffix: %d\n", enc_suffix);
 #endif
 
+	/* when the action is denied, it means the operation didn't complete,
+	 so there isn't a case of succesfull encryption
+	 */
+	if (e->action_denied == 1)
+		return;
+
 	if (enc_suffix)
 	{ /* search if the filename without the encrypt suffix exists */
 		char bufname[BUFSIZ];

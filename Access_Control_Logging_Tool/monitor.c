@@ -76,7 +76,7 @@ void printLogEntry(logEntry *e)
     printf("uid: %d\n", e->uid);
     printf("filename: %s\n", e->filename);
     printf("date: %s\n", e->date);
-    printf("time: %u\n", e->time);
+    printf("time: %li\n", e->time);
     printf("type: %d\n", e->type);
     printf("action_denied: %d\n", e->action_denied);
     printf("fingerprint: %s\n", e->fingerprint);

@@ -14,7 +14,7 @@ typedef struct file_history file_history;
 struct file_history
 {
 	uid_t uid;
-	unsigned char *fingerprint[MD5_DIGEST_LENGTH];
+	unsigned char fingerprint[33];
 	unsigned int timesModified;
 };
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <openssl/md5.h>
 
 /* Path to log file */
 #define _LOG_PATH_ "my_logfile.log"
